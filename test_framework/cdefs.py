@@ -50,7 +50,6 @@ def get_srcdir():
 
 
 # Slurp in consensus.h contents
-print("get src "+get_srcdir())
 _consensus_h_fh = open(os.path.join(get_srcdir(), 'src', 'consensus',
                                     'consensus.h'), 'rt')
 _consensus_h_contents = _consensus_h_fh.read()
