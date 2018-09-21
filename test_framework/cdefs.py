@@ -27,7 +27,9 @@ def get_srcdir():
             cand_path = os.path.join(path_to_check, 'src')
             return os.path.exists(cand_path) and os.path.isdir(cand_path)
 
-    srcdir = os.environ.get('SRCDIR', '')
+    #srcdir = os.environ.get('SRCDIR', '')
+    srcdir = os.getcwd()
+    print("src"+srcdir)
     if contains_src(srcdir):
         return srcdir
 
@@ -36,6 +38,7 @@ def get_srcdir():
     mainmod = sys.modules['__main__']
     mainmod_path = getattr(mainmod, '__file__', '')
     if mainmod_path and mainmod_path.endswith('.py'):
+        print(mainmod_path)
         maybe_top = mainmod_path
         while maybe_top != '/':
             maybe_top = os.path.abspath(os.path.dirname(maybe_top))
@@ -47,6 +50,7 @@ def get_srcdir():
 
 
 # Slurp in consensus.h contents
+print("get src "+get_srcdir())
 _consensus_h_fh = open(os.path.join(get_srcdir(), 'src', 'consensus',
                                     'consensus.h'), 'rt')
 _consensus_h_contents = _consensus_h_fh.read()
