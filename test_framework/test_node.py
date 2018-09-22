@@ -40,7 +40,11 @@ class TestNode():
     def __init__(self, i, dirname, extra_args, rpchost, timewait, binary, stderr, mocktime, coverage_dir):
         self.index = i
         self.datadir = os.path.join(dirname, "node" + str(i))
-        self.rpchost = rpchost
+        if rpchost is None:
+            # TODO: get from config file
+            self.rpchost = '127.0.0.1:18334'
+        else:
+            self.rpchost = rpchost
         if timewait:
             self.rpc_timeout = timewait
         else:
@@ -203,7 +207,9 @@ class TestNodeCLI():
         assert not (
             pos_args and named_args), "Cannot use positional arguments and named arguments in the same bitcoin-cli call"
 
-        p_args = [self.binary, self.args]
+        configfile = os.getcwd() + "/conf/coperctl.conf"
+        p_args = [self.binary, "--configfile=" + configfile] + self.args
+        p_args += [command] + pos_args
         process = subprocess.Popen(p_args, stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         cli_stdout, cli_stderr = process.communicate(input=self.input)
