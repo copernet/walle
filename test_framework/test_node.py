@@ -54,10 +54,10 @@ class TestNode():
         self.coverage_dir = coverage_dir
         # Most callers will just need to add extra args to the standard list below. For those callers that need more flexibity, they can just set the args property directly.
         self.extra_args = extra_args
-        self.args = [self.binary, "--datadir=" + self.datadir]
+        self.args = [self.binary]
 
         self.cli = TestNodeCLI(
-            os.getenv("BITCOINCLI", "bitcoin-cli"), self.datadir)
+            os.getenv("BITCOINCLI", "coperctl"), self.datadir)
 
         self.running = False
         self.process = None
@@ -203,10 +203,7 @@ class TestNodeCLI():
         assert not (
             pos_args and named_args), "Cannot use positional arguments and named arguments in the same bitcoin-cli call"
 
-        p_args = [self.binary, "-datadir=" + self.datadir] + self.args
-        if named_args:
-            p_args += ["-named"]
-        p_args += [command] + pos_args + named_args
+        p_args = [self.binary, self.args]
         process = subprocess.Popen(p_args, stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         cli_stdout, cli_stderr = process.communicate(input=self.input)
