@@ -45,7 +45,7 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_FAILED = 1
 TEST_EXIT_SKIPPED = 77
 
-os.environ["BITCOIND"] = os.getcwd() + "/bitcoind"
+os.environ["BITCOIND"] = os.getcwd() + "/copernicus"
 
 class BitcoinTestFramework():
     """Base class for a bitcoin test script.
