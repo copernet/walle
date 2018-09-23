@@ -314,7 +314,7 @@ def rpc_url(datadir, i, rpchost=None):
             host, port = parts
         else:
             host = rpchost
-    return "http://%s:%s@%s:%d" % (rpc_u, rpc_p, host, int(port))
+    return "https://%s:%s@%s:%d" % (rpc_u, rpc_p, host, int(port))
 
 # Node functions
 ################
@@ -340,17 +340,18 @@ def get_datadir_path(dirname, n):
 def get_auth_cookie(datadir):
     user = None
     password = None
-    if os.path.isfile(os.path.join(datadir, "bitcoin.conf")):
-        with open(os.path.join(datadir, "bitcoin.conf"), 'r', encoding='utf8') as f:
+    confdir = os.getcwd() + "/conf"
+    if os.path.isfile(os.path.join(confdir, "coperctl.conf")):
+        with open(os.path.join(confdir, "coperctl.conf"), 'r', encoding='utf8') as f:
             for line in f:
                 if line.startswith("rpcuser="):
                     assert user is None  # Ensure that there is only one rpcuser line
                     user = line.split("=")[1].strip("\n")
-                if line.startswith("rpcpassword="):
+                if line.startswith("rpcpass="):
                     assert password is None  # Ensure that there is only one rpcpassword line
                     password = line.split("=")[1].strip("\n")
-    if os.path.isfile(os.path.join(datadir, "regtest", ".cookie")):
-        with open(os.path.join(datadir, "regtest", ".cookie"), 'r') as f:
+    if os.path.isfile(os.path.join(confdir, "regtest", ".cookie")):
+        with open(os.path.join(confdir, "regtest", ".cookie"), 'r') as f:
             userpass = f.read()
             split_userpass = userpass.split(':')
             user = split_userpass[0]
