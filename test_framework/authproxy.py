@@ -41,6 +41,7 @@ import logging
 import socket
 import time
 import urllib.parse
+import ssl
 
 HTTP_TIMEOUT = 30
 USER_AGENT = "AuthServiceProxy/0.1"
@@ -80,6 +81,7 @@ class AuthServiceProxy():
             'utf8')
         authpair = user + b':' + passwd
         self.__auth_header = b'Basic ' + base64.b64encode(authpair)
+        ssl._create_default_https_context = ssl._create_unverified_context
 
         if connection:
             # Callables re-use the connection of the original proxy
