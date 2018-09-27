@@ -304,7 +304,7 @@ def rpc_port(n):
     return PORT_MIN + PORT_RANGE + n + (MAX_NODES * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES)
 
 
-def rpc_url(datadir, i, rpchost=None):
+def rpc_url(datadir, i, rpchost=None, scheme='https'):
     rpc_u, rpc_p = get_auth_cookie(datadir)
     host = '127.0.0.1'
     port = rpc_port(i)
@@ -314,7 +314,7 @@ def rpc_url(datadir, i, rpchost=None):
             host, port = parts
         else:
             host = rpchost
-    return "https://%s:%s@%s:%d" % (rpc_u, rpc_p, host, int(port))
+    return f"{scheme}://{rpc_u}:{rpc_p}@{host}:{port}"
 
 # Node functions
 ################
@@ -324,12 +324,66 @@ def initialize_datadir(dirname, n):
     datadir = os.path.join(dirname, "node" + str(n))
     if not os.path.isdir(datadir):
         os.makedirs(datadir)
-    with open(os.path.join(datadir, "bitcoin.conf"), 'w', encoding='utf8') as f:
-        f.write("regtest=1\n")
-        f.write("port=" + str(p2p_port(n)) + "\n")
-        f.write("rpcport=" + str(rpc_port(n)) + "\n")
-        f.write("listenonion=0\n")
-        f.write("usecashaddr=1\n")
+    content = f'''
+GoVersion: 1.9.2
+Version: 1.0.0
+BuildDate: 20180428
+
+RPC:
+  RPCListeners: ["127.0.0.1:{str(rpc_port(n))}", "127.0.0.1:{str(rpc_port(n) + 1)}"]
+  RPCUser: copernicus
+  RPCPass: doXT3DXgAQCNU0Li0pujQ6zR3Y
+  RPCMaxClients: 1000
+
+Log:
+  FileName: copernicus
+  Level: info
+  Module: [mempool,utxo,bench,service]
+
+Mempool:
+  MaxPoolSize: 300000000
+
+Mining:
+  BlockMinTxFee: 100
+  BlockMaxSize: 2000000
+  BlockVersion: 1
+  Strategy: ancestorfeerate
+Chain:
+  AssumeValid:
+  StartLogHeight: 2147483647
+P2PNet:
+  ListenAddrs: ["127.0.0.1:{str(p2p_port(n))}","127.0.0.1:{str(p2p_port(n) + 1)}"]
+  MaxPeers: 5
+  TargetOutbound: 1
+  ConnectPeersOnStart:
+  DisableBanning: true
+  SimNet: false
+  DisableListen: false
+  BlocksOnly: false
+  DisableDNSSeed: false
+  DisableRPC: false
+  Upnp: false
+  DisableTLS: true
+
+Protocal:
+  NoPeerBloomFilters: true
+  DisableCheckpoints: true
+
+AddrMgr:
+  SimNet: false
+  ConnectPeers:
+
+Script:
+  AcceptDataCarrier:
+  MaxDatacarrierBytes:
+  IsBareMultiSigStd:
+  PromiscuousMempoolFlags:
+
+TxOut:
+  DustRelayFee:
+'''
+    with open(os.path.join(datadir, "conf.yml"), 'w', encoding='utf8') as f:
+        f.write(content)
     return datadir
 
 

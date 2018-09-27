@@ -146,8 +146,8 @@ class BitcoinTestFramework():
 
         if not self.options.noshutdown:
             self.log.info("Stopping nodes")
-            #if self.nodes:
-                #self.stop_nodes()
+            if self.nodes:
+                self.stop_nodes()
         else:
             self.log.info(
                 "Note: bitcoinds were not stopped and may still be running")

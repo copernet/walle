@@ -7,6 +7,7 @@
 from .mininode import *
 from io import BytesIO
 import dbm.dumb as dbmd
+import logging
 
 logger = logging.getLogger("TestFramework.blockstore")
 

@@ -12,6 +12,7 @@ import logging
 import os
 import subprocess
 import time
+import yaml
 
 from .mininode import COIN, ToHex, FromHex, CTransaction
 from .util import (
@@ -40,9 +41,12 @@ class TestNode():
     def __init__(self, i, dirname, extra_args, rpchost, timewait, binary, stderr, mocktime, coverage_dir):
         self.index = i
         self.datadir = os.path.join(dirname, "node" + str(i))
+        with open(os.path.join(self.datadir, 'conf.yml')) as f:
+            self.configData = yaml.load(f)
+
         if rpchost is None:
             # TODO: get from config file
-            self.rpchost = '127.0.0.1:18334'
+            self.rpchost = self.configData['RPC']['RPCListeners'][1]
         else:
             self.rpchost = rpchost
         if timewait:
@@ -58,7 +62,6 @@ class TestNode():
         self.coverage_dir = coverage_dir
         # Most callers will just need to add extra args to the standard list below. For those callers that need more flexibity, they can just set the args property directly.
         self.extra_args = extra_args
-        self.args = [self.binary]
 
         self.cli = TestNodeCLI(
             os.getenv("BITCOINCLI", "coperctl"), self.datadir)
@@ -83,7 +86,12 @@ class TestNode():
             extra_args = self.extra_args
         if stderr is None:
             stderr = self.stderr
-        self.process = subprocess.Popen(self.args, stderr=stderr)
+
+        self.args = [self.binary]
+        self.args.append('--datadir')
+        self.args.append(self.datadir)
+
+        self.process = subprocess.Popen(self.args, stdout=open(os.devnull, 'w'), stderr=stderr)
         self.running = True
         self.log.debug("bitcoind started, waiting for RPC to come up")
 
@@ -95,7 +103,8 @@ class TestNode():
             assert self.process.poll(
             ) is None, "bitcoind exited with status %i during initialization" % self.process.returncode
             try:
-                self.rpc = get_rpc_proxy(rpc_url(self.datadir, self.index, self.rpchost),
+                scheme = 'http' if self.configData['P2PNet']['DisableTLS'] else 'https'
+                self.rpc = get_rpc_proxy(rpc_url(self.datadir, self.index, self.rpchost, scheme),
                                          self.index, timeout=self.rpc_timeout, coveragedir=self.coverage_dir)
                 self.rpc.getblockcount()
                 # If the call to getblockcount() succeeds then the RPC connection is up
