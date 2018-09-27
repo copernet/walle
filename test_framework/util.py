@@ -320,8 +320,8 @@ def rpc_url(datadir, i, rpchost=None, scheme='https'):
 ################
 
 
-def initialize_datadir(dirname, n):
-    datadir = os.path.join(dirname, "node" + str(n))
+def initialize_datadir(dirname, n, network):
+    datadir = os.path.join(dirname, "node" + str(n), network)
     if not os.path.isdir(datadir):
         os.makedirs(datadir)
     content = f'''

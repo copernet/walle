@@ -38,10 +38,10 @@ class TestNode():
     To make things easier for the test writer, a bit of magic is happening under the covers.
     Any unrecognised messages will be dispatched to the RPC connection."""
 
-    def __init__(self, i, dirname, extra_args, rpchost, timewait, binary, stderr, mocktime, coverage_dir):
+    def __init__(self, i, dirname, extra_args, rpchost, timewait, binary, stderr, mocktime, coverage_dir, network):
         self.index = i
         self.datadir = os.path.join(dirname, "node" + str(i))
-        with open(os.path.join(self.datadir, 'conf.yml')) as f:
+        with open(os.path.join(self.datadir, network, 'conf.yml')) as f:
             self.configData = yaml.load(f)
 
         if rpchost is None:
@@ -80,7 +80,7 @@ class TestNode():
         assert self.rpc_connected, "Error: No RPC connection"
         return self.rpc.__getattr__(*args, **kwargs)
 
-    def start(self, extra_args=None, stderr=None):
+    def start(self, extra_args=None, network = 'regtest', stderr=None):
         """Start the node."""
         if extra_args is None:
             extra_args = self.extra_args
@@ -88,6 +88,7 @@ class TestNode():
             stderr = self.stderr
 
         self.args = [self.binary]
+        self.args.append('--' + network)
         self.args.append('--datadir')
         self.args.append(self.datadir)
 

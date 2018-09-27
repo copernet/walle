@@ -7,7 +7,7 @@
 from collections import deque
 from enum import Enum
 import logging
-import optparse
+import argparse 
 import os
 import pdb
 import shutil
@@ -76,31 +76,35 @@ class BitcoinTestFramework():
     def main(self):
         """Main function. This should not be overridden by the subclass test scripts."""
 
-        parser = optparse.OptionParser(usage="%prog [options]")
-        parser.add_option("--nocleanup", dest="nocleanup", default=False, action="store_true",
+        parser = argparse.ArgumentParser(usage="prog [options]")
+        parser.add_argument("--nocleanup", dest="nocleanup", default=False, action="store_true",
                           help="Leave bitcoinds and test.* datadir on exit or error")
-        parser.add_option("--noshutdown", dest="noshutdown", default=False, action="store_true",
+        parser.add_argument("--noshutdown", dest="noshutdown", default=False, action="store_true",
                           help="Don't stop bitcoinds after the test execution")
-        parser.add_option("--srcdir", dest="srcdir", default=os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../../../src"),
-                          help="Source directory containing bitcoind/bitcoin-cli (default: %default)")
-        parser.add_option("--cachedir", dest="cachedir", default=os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../../cache"),
+        parser.add_argument("--srcdir", dest="srcdir", default=os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../../../src"),
+                          help='Source directory containing bitcoind/bitcoin-cli')
+        parser.add_argument("--cachedir", dest="cachedir", default=os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../../cache"),
                           help="Directory for caching pregenerated datadirs")
-        parser.add_option("--tmpdir", dest="tmpdir",
+        parser.add_argument("--tmpdir", dest="tmpdir",
                           help="Root directory for datadirs")
-        parser.add_option("-l", "--loglevel", dest="loglevel", default="INFO",
+        parser.add_argument("-l", "--loglevel", dest="loglevel", default="INFO",
                           help="log events at this level and higher to the console. Can be set to DEBUG, INFO, WARNING, ERROR or CRITICAL. Passing --loglevel DEBUG will output all logs to console. Note that logs at all levels are always written to the test_framework.log file in the temporary test directory.")
-        parser.add_option("--tracerpc", dest="trace_rpc", default=False, action="store_true",
+        parser.add_argument("--tracerpc", dest="trace_rpc", default=False, action="store_true",
                           help="Print out all RPC calls as they are made")
-        parser.add_option("--portseed", dest="port_seed", default=os.getpid(), type='int',
+        parser.add_argument("--portseed", dest="port_seed", default=os.getpid(), type=int,
                           help="The seed to use for assigning port numbers (default: current process id)")
-        parser.add_option("--coveragedir", dest="coveragedir",
+        parser.add_argument("--coveragedir", dest="coveragedir",
                           help="Write tested RPC commands into this directory")
-        parser.add_option("--configfile", dest="configfile",
+        parser.add_argument("--configfile", dest="configfile",
                           help="Location of the test framework config file")
-        parser.add_option("--pdbonfailure", dest="pdbonfailure", default=False, action="store_true",
+        parser.add_argument("--pdbonfailure", dest="pdbonfailure", default=False, action="store_true",
                           help="Attach a python debugger if test fails")
+        parser.add_argument("--net", dest="network", default="regtest", choices=['regtest', 'testnet'],
+                          help="regtest or testnet")
+
         self.add_options(parser)
-        (self.options, self.args) = parser.parse_args()
+        #(self.options, self.args) = parser.parse_args()
+        self.options = parser.parse_args()
 
         PortSeed.n = self.options.port_seed
 
@@ -238,15 +242,17 @@ class BitcoinTestFramework():
         assert_equal(len(extra_args), num_nodes)
         assert_equal(len(binary), num_nodes)
         for i in range(num_nodes):
-            self.nodes.append(TestNode(i, self.options.tmpdir, extra_args[i], rpchost, timewait=timewait,
-                                       binary=binary[i], stderr=None, mocktime=self.mocktime, coverage_dir=self.options.coveragedir))
+            self.nodes.append(TestNode(i, self.options.tmpdir, extra_args[i], rpchost, 
+                                        timewait=timewait, binary=binary[i], stderr=None, 
+                                        mocktime=self.mocktime, coverage_dir=self.options.coveragedir,
+                                        network=self.options.network
+                                       ))
 
     def start_node(self, i, extra_args=None, stderr=None):
         """Start a bitcoind"""
-
+        print(self.options.network)
         node = self.nodes[i]
-
-        node.start(extra_args, stderr)
+        node.start(extra_args, self.options.network, stderr)
         node.wait_for_rpc_connection()
 
         if self.options.coveragedir is not None:
@@ -260,7 +266,7 @@ class BitcoinTestFramework():
         assert_equal(len(extra_args), self.num_nodes)
         try:
             for i, node in enumerate(self.nodes):
-                node.start(extra_args[i])
+                node.start(extra_args[i], self.options.network)
             for node in self.nodes:
                 node.wait_for_rpc_connection()
         except:
@@ -464,7 +470,7 @@ class BitcoinTestFramework():
         Create an empty blockchain and num_nodes wallets.
         Useful if a test case wants complete control over initialization."""
         for i in range(self.num_nodes):
-            initialize_datadir(self.options.tmpdir, i)
+            initialize_datadir(self.options.tmpdir, i, self.options.network)
 
 
 class ComparisonTestFramework(BitcoinTestFramework):
@@ -480,10 +486,10 @@ class ComparisonTestFramework(BitcoinTestFramework):
         self.setup_clean_chain = True
 
     def add_options(self, parser):
-        parser.add_option("--testbinary", dest="testbinary",
+        parser.add_argument("--testbinary", dest="testbinary",
                           default=os.getenv("BITCOIND", "bitcoind"),
                           help="bitcoind binary to test")
-        parser.add_option("--refbinary", dest="refbinary",
+        parser.add_argument("--refbinary", dest="refbinary",
                           default=os.getenv("BITCOIND", "bitcoind"),
                           help="bitcoind binary to use for reference nodes (if any)")
 
