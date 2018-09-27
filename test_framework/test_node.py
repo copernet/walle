@@ -88,6 +88,7 @@ class TestNode():
             stderr = self.stderr
 
         self.args = [self.binary]
+        self.args.append('--regtest')
         self.args.append('--datadir')
         self.args.append(self.datadir)
 
