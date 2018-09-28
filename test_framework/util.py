@@ -3,7 +3,7 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Helpful routines for regression testing."""
-
+import socket
 from base64 import b64encode
 from binascii import hexlify, unhexlify
 from decimal import Decimal, ROUND_DOWN
@@ -295,13 +295,43 @@ def get_rpc_proxy(url, node_number, timeout=None, coveragedir=None):
     return coverage.AuthServiceProxyWrapper(proxy, coverage_logfile)
 
 
-def p2p_port(n):
+def find_free_ports(count, start_port, end_port):
+    assert count > 0
+    assert start_port > 2
+
+    not_continuous_ips = []
+
+    ips = []
+    last_port = start_port - 2
+    for port in range(start_port, end_port, 2):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            res = sock.connect_ex(('localhost', port))
+            if res == 0:
+                continue
+
+            if last_port != port - 2:
+                ips = []
+                not_continuous_ips.append(port)
+            else:
+                ips.append(port)
+
+            last_port = port
+
+        if len(ips) == count:
+            return ips
+
+    return not_continuous_ips[:count]
+
+
+def p2p_port(n, p2p_ports=find_free_ports(MAX_NODES, 10000, 30000)):
     assert(n <= MAX_NODES)
-    return PORT_MIN + n + (MAX_NODES * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES)
+    return p2p_ports[n]
+    # return PORT_MIN + n + (MAX_NODES * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES)
 
 
-def rpc_port(n):
-    return PORT_MIN + PORT_RANGE + n + (MAX_NODES * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES)
+def rpc_port(n, rpc_ports=find_free_ports(MAX_NODES, 30000, 50000)):
+    return rpc_ports[n]
+    # return PORT_MIN + PORT_RANGE + n + (MAX_NODES * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES)
 
 
 def rpc_url(datadir, i, rpchost=None, scheme='https'):
