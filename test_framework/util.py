@@ -286,7 +286,8 @@ def get_rpc_proxy(url, node_number, timeout=None, coveragedir=None):
     if timeout is not None:
         proxy_kwargs['timeout'] = timeout
 
-    proxy = AuthServiceProxy(url, **proxy_kwargs)
+    node_name = "node" + str(node_number)
+    proxy = AuthServiceProxy(node_name, url, **proxy_kwargs)
     proxy.url = url  # store URL on proxy for info
 
     coverage_logfile = coverage.get_filename(
@@ -295,43 +296,15 @@ def get_rpc_proxy(url, node_number, timeout=None, coveragedir=None):
     return coverage.AuthServiceProxyWrapper(proxy, coverage_logfile)
 
 
-def find_free_ports(count, start_port, end_port):
-    assert count > 0
-    assert start_port > 2
-
-    not_continuous_ips = []
-
-    ips = []
-    last_port = start_port - 2
-    for port in range(start_port, end_port, 2):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            res = sock.connect_ex(('localhost', port))
-            if res == 0:
-                continue
-
-            if last_port != port - 2:
-                ips = []
-                not_continuous_ips.append(port)
-            else:
-                ips.append(port)
-
-            last_port = port
-
-        if len(ips) == count:
-            return ips
-
-    return not_continuous_ips[:count]
-
-
-def p2p_port(n, p2p_ports=find_free_ports(MAX_NODES, 10000, 30000)):
+def p2p_port(n):
     assert(n <= MAX_NODES)
-    return p2p_ports[n]
-    # return PORT_MIN + n + (MAX_NODES * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES)
+    # each node will listen on two p2p ports
+    return PORT_MIN + 2*n + (MAX_NODES*2 * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES*2)
 
 
-def rpc_port(n, rpc_ports=find_free_ports(MAX_NODES, 30000, 50000)):
-    return rpc_ports[n]
-    # return PORT_MIN + PORT_RANGE + n + (MAX_NODES * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES)
+def rpc_port(n):
+    # each node will listen on two rpc ports
+    return PORT_MIN + PORT_RANGE + 2*n + (MAX_NODES*2 * PortSeed.n) % (PORT_RANGE - 1 - MAX_NODES*2)
 
 
 def rpc_url(datadir, i, rpchost=None, scheme='https'):
@@ -350,7 +323,10 @@ def rpc_url(datadir, i, rpchost=None, scheme='https'):
 ################
 
 
-def initialize_datadir(dirname, n, network):
+def initialize_datadir(dirname, n, network, log):
+    log.info("Node: node%d | RPC ports: %d, %d | P2P ports: %d, %d" %
+             (n, rpc_port(n), rpc_port(n) + 1, p2p_port(n), p2p_port(n) + 1))
+
     datadir = os.path.join(dirname, "node" + str(n), network)
     if not os.path.isdir(datadir):
         os.makedirs(datadir)
