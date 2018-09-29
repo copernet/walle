@@ -415,7 +415,7 @@ class BitcoinTestFramework():
 
             # Create cache directories, run bitcoinds:
             for i in range(MAX_NODES):
-                datadir = initialize_datadir(self.options.cachedir, i)
+                datadir = initialize_datadir(self.options.cachedir, i, self.log)
                 args = [os.getenv("BITCOIND", "bitcoind"), "-server",
                         "-keypool=1", "-datadir=" + datadir, "-discover=0"]
                 if i > 0:
@@ -462,7 +462,7 @@ class BitcoinTestFramework():
             to_dir = os.path.join(self.options.tmpdir, "node" + str(i))
             shutil.copytree(from_dir, to_dir)
             # Overwrite port/rpcport in bitcoin.conf
-            initialize_datadir(self.options.tmpdir, i)
+            initialize_datadir(self.options.tmpdir, i, self.log)
 
     def _initialize_chain_clean(self):
         """Initialize empty blockchain for use by the test.
@@ -470,7 +470,7 @@ class BitcoinTestFramework():
         Create an empty blockchain and num_nodes wallets.
         Useful if a test case wants complete control over initialization."""
         for i in range(self.num_nodes):
-            initialize_datadir(self.options.tmpdir, i, self.options.network)
+            initialize_datadir(self.options.tmpdir, i, self.options.network, self.log)
 
 
 class ComparisonTestFramework(BitcoinTestFramework):

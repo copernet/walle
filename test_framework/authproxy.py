@@ -69,7 +69,8 @@ class AuthServiceProxy():
     __id_count = 0
 
     # ensure_ascii: escape unicode as \uXXXX, passed to json.dumps
-    def __init__(self, service_url, service_name=None, timeout=HTTP_TIMEOUT, connection=None, ensure_ascii=True):
+    def __init__(self, node_name, service_url, service_name=None, timeout=HTTP_TIMEOUT, connection=None, ensure_ascii=True):
+        self.__node_name = node_name
         self.__service_url = service_url
         self._service_name = service_name
         self.ensure_ascii = ensure_ascii  # can be toggled on the fly by tests
@@ -99,7 +100,7 @@ class AuthServiceProxy():
             raise AttributeError
         if self._service_name is not None:
             name = "%s.%s" % (self._service_name, name)
-        return AuthServiceProxy(self.__service_url, name, connection=self.__conn)
+        return AuthServiceProxy(self.__node_name, self.__service_url, name, connection=self.__conn)
 
     def _request(self, method, path, postdata):
         '''
@@ -130,7 +131,7 @@ class AuthServiceProxy():
     def get_request(self, *args, **argsn):
         AuthServiceProxy.__id_count += 1
 
-        log.debug("-%s-> %s %s" % (AuthServiceProxy.__id_count, self._service_name,
+        log.debug("--%02s--->[%s] %s %s" % (AuthServiceProxy.__id_count, self.__node_name, self._service_name,
                                    json.dumps(args, default=EncodeDecimal, ensure_ascii=self.ensure_ascii)))
         if args and argsn:
             raise ValueError(
@@ -183,11 +184,11 @@ class AuthServiceProxy():
         response = json.loads(responsedata, parse_float=decimal.Decimal)
         elapsed = time.time() - req_start_time
         if "error" in response and response["error"] is None:
-            log.debug("<-%s- [%.6f] %s" % (response["id"], elapsed, json.dumps(
+            log.debug("<-%02s----[%s][%.6f] %s" % (response["id"], self.__node_name, elapsed, json.dumps(
                 response["result"], default=EncodeDecimal, ensure_ascii=self.ensure_ascii)))
         else:
-            log.debug("<-- [%.6f] %s" % (elapsed, responsedata))
+            log.debug("<=%02s======[%s] [%.6f] %s" % (response["id"], self.__node_name, elapsed, responsedata))
         return response
 
     def __truediv__(self, relative_uri):
-        return AuthServiceProxy("{}/{}".format(self.__service_url, relative_uri), self._service_name, connection=self.__conn)
+        return AuthServiceProxy(self.__node_name, "{}/{}".format(self.__service_url, relative_uri), self._service_name, connection=self.__conn)
