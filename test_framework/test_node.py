@@ -14,6 +14,8 @@ import subprocess
 import time
 import yaml
 
+from .retrying import retry
+
 from .mininode import COIN, ToHex, FromHex, CTransaction
 from .util import (
     assert_equal,
@@ -130,7 +132,8 @@ class TestNode():
         assert self.rpc
         wallet_path = "wallet/%s" % wallet_name
         return self.rpc / wallet_path
-
+    
+    @retry(stop_max_attempt_number=3, wait_fixed=1000, log_func_name='log')
     def stop_node(self):
         """Stop the node."""
         if not self.running:
@@ -140,6 +143,7 @@ class TestNode():
             self.stop()
         except http.client.CannotSendRequest:
             self.log.exception("Unable to stop node.")
+            raise
 
     def is_node_stopped(self):
         """Checks whether the node has stopped.

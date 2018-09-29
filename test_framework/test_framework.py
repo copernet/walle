@@ -151,7 +151,15 @@ class BitcoinTestFramework():
         if not self.options.noshutdown:
             self.log.info("Stopping nodes")
             if self.nodes:
-                self.stop_nodes()
+                try:
+                    self.stop_nodes()
+                except Exception:
+                    self.log.exception("rpc stop failed, will kill it")
+                    for node in self.nodes:
+                        if node.process.returncode == None:
+                            pid = node.process.pid
+                            self.log.info(f'kill prcess {pid}')
+                            node.process.kill()
         else:
             self.log.info(
                 "Note: bitcoinds were not stopped and may still be running")
@@ -250,7 +258,6 @@ class BitcoinTestFramework():
 
     def start_node(self, i, extra_args=None, stderr=None):
         """Start a bitcoind"""
-        print(self.options.network)
         node = self.nodes[i]
         node.start(extra_args, self.options.network, stderr)
         node.wait_for_rpc_connection()
