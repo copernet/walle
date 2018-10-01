@@ -4,3 +4,6 @@ bitcoind
 .venv
 .vscode
 .env
+*/*.pyc
+.idea/
+coperctl

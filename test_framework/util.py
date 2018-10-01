@@ -343,7 +343,7 @@ RPC:
 
 Log:
   FileName: copernicus
-  Level: info
+  Level: debug
   Module: [mempool,utxo,bench,service]
 
 Mempool:
@@ -452,8 +452,11 @@ def connect_nodes(from_connection, node_num):
     from_connection.addnode(ip_port, "onetry")
     # poll until version handshake complete to avoid race conditions
     # with transaction relaying
-    while any(peer['version'] == 0 for peer in from_connection.getpeerinfo()):
+
+    peers = from_connection.getpeerinfo()
+    while len(peers) == 0 or any(peer['version'] == 0 for peer in peers):
         time.sleep(0.1)
+        peers = from_connection.getpeerinfo()
 
 
 def connect_nodes_bi(nodes, a, b):
