@@ -470,7 +470,7 @@ class BitcoinTestFramework():
             to_dir = os.path.join(self.options.tmpdir, "node" + str(i))
             shutil.copytree(from_dir, to_dir)
             # Overwrite port/rpcport in bitcoin.conf
-            initialize_datadir(self.options.tmpdir, i, self.log)
+            initialize_datadir(self.options.tmpdir, i, self.options.network, self.log)
 
     def _initialize_chain_clean(self):
         """Initialize empty blockchain for use by the test.
