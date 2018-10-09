@@ -1431,7 +1431,7 @@ class NodeConnCB():
 
     def on_headers(self, conn, message): pass
 
-    def on_mempool(self, conn): pass
+    def on_mempool(self, conn, message): pass
 
     def on_pong(self, conn, message): pass
 

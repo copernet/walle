@@ -453,10 +453,8 @@ def connect_nodes(from_connection, node_num):
     # poll until version handshake complete to avoid race conditions
     # with transaction relaying
 
-    peers = from_connection.getpeerinfo()
-    while len(peers) == 0 or any(peer['version'] == 0 for peer in peers):
+    while any(peer['version'] == 0 for peer in from_connection.getpeerinfo()):
         time.sleep(0.1)
-        peers = from_connection.getpeerinfo()
 
 
 def connect_nodes_bi(nodes, a, b):
