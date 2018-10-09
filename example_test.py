@@ -150,8 +150,6 @@ class ExampleTest(BitcoinTestFramework):
         blocks = [int(self.nodes[0].generate(nblocks=1)[0], 16)]
         self.sync_all([self.nodes[0:1]])
 
-        self.nodes[1].waitforblockheight(1)
-
         # Notice above how we called an RPC by calling a method with the same
         # name on the node object. Notice also how we used a keyword argument
         # to specify a named RPC argument. Neither of those are defined on the
