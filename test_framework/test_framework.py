@@ -32,6 +32,7 @@ from .util import (
     set_node_times,
     sync_blocks,
     sync_mempools,
+    connect_nodes
 )
 
 
@@ -422,16 +423,16 @@ class BitcoinTestFramework():
 
             # Create cache directories, run bitcoinds:
             for i in range(MAX_NODES):
-                datadir = initialize_datadir(self.options.cachedir, i, self.options.network, self.log)
-                args = [os.getenv("BITCOIND", "bitcoind"), "-server",
-                        "-keypool=1", "-datadir=" + datadir, "-discover=0"]
-                if i > 0:
-                    args.append("-connect=127.0.0.1:" + str(p2p_port(0)))
+                initialize_datadir(self.options.cachedir, i, self.options.network, self.log)
+
+
                 self.nodes.append(TestNode(i, self.options.cachedir, extra_args=[
                 ], rpchost=None, timewait=None, binary=None, stderr=None, mocktime=self.mocktime,
                                            coverage_dir=None, network=self.options.network))
-                self.nodes[i].args = args
                 self.start_node(i)
+
+                if i > 0:
+                    connect_nodes(self.nodes[i], 0)
 
             # Wait for RPC connections to be ready
             for node in self.nodes:
