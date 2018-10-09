@@ -49,6 +49,30 @@ class ABC_RPC_Test (BitcoinTestFramework):
         ebs = getsize['excessiveBlockSize']
         assert_equal(ebs, LEGACY_MAX_BLOCK_SIZE + 1)
 
+        # Check setting to 2MB
+        self.nodes[0].setexcessiveblock(2 * ONE_MEGABYTE)
+        getsize = self.nodes[0].getexcessiveblock()
+        ebs = getsize['excessiveBlockSize']
+        assert_equal(ebs, 2 * ONE_MEGABYTE)
+        # Check for EB correctness in the subver string
+        self.check_subversion("/Copernicus:[\d\.]+/")
+
+        # Check setting to 13MB
+        self.nodes[0].setexcessiveblock(13 * ONE_MEGABYTE)
+        getsize = self.nodes[0].getexcessiveblock()
+        ebs = getsize['excessiveBlockSize']
+        assert_equal(ebs, 13 * ONE_MEGABYTE)
+        # Check for EB correctness in the subver string
+        self.check_subversion("/Copernicus:[\d\.]+/")
+
+        # Check setting to 13.14MB
+        self.nodes[0].setexcessiveblock(13140000)
+        getsize = self.nodes[0].getexcessiveblock()
+        ebs = getsize['excessiveBlockSize']
+        assert_equal(ebs, 13.14 * ONE_MEGABYTE)
+        # check for EB correctness in the subver string
+        self.check_subversion("/Copernicus:[\d\.]+/")
+
     def run_test(self):
         self.genesis_hash = int(self.nodes[0].getbestblockhash(), 16)
         self.test_excessiveblock()
