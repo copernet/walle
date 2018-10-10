@@ -31,3 +31,8 @@ Run test case
 pipenv run python abc-rpc.py
 ```
 
+Initialize 200-block-long chain
+```
+pipenv run python create_cache.py
+```
+
