@@ -359,8 +359,8 @@ Chain:
   StartLogHeight: 2147483647
 P2PNet:
   ListenAddrs: ["127.0.0.1:{str(p2p_port(n))}","127.0.0.1:{str(p2p_port(n) + 1)}"]
-  MaxPeers: 5
-  TargetOutbound: 1
+  MaxPeers: 128
+  TargetOutbound: 8
   ConnectPeersOnStart:
   DisableBanning: true
   SimNet: false
