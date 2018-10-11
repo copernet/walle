@@ -370,6 +370,7 @@ P2PNet:
   DisableRPC: false
   Upnp: false
   DisableTLS: true
+  UserAgentComments: "testnode{str(n)}"
 
 Protocal:
   NoPeerBloomFilters: true
@@ -437,7 +438,7 @@ def set_node_times(nodes, t):
 
 def disconnect_nodes(from_connection, node_num):
     for peer_id in [peer['id'] for peer in from_connection.getpeerinfo() if "testnode%d" % node_num in peer['subver']]:
-        from_connection.disconnectnode(nodeid=peer_id)
+        from_connection.disconnectnode(target=str(peer_id))
 
     for _ in range(50):
         if [peer['id'] for peer in from_connection.getpeerinfo() if "testnode%d" % node_num in peer['subver']] == []:

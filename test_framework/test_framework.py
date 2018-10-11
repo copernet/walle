@@ -424,13 +424,10 @@ class BitcoinTestFramework():
             # Create cache directories, run bitcoinds:
             for i in range(MAX_NODES):
                 initialize_datadir(self.options.cachedir, i, self.options.network, self.log)
-
-
                 self.nodes.append(TestNode(i, self.options.cachedir, extra_args=[
                 ], rpchost=None, timewait=None, binary=None, stderr=None, mocktime=self.mocktime,
                                            coverage_dir=None, network=self.options.network))
                 self.start_node(i)
-
                 if i > 0:
                     connect_nodes(self.nodes[i], 0)
 
