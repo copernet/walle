@@ -128,7 +128,7 @@ class BlockchainTest(BitcoinTestFramework):
     def _test_getblockheader(self):
         node = self.nodes[0]
 
-        assert_raises_rpc_error(-22, "Argument must be hexadecimal string (not \"nonsense\")",
+        assert_raises_rpc_error(-5, "Block not found",
                                 node.getblockheader, "nonsense")
 
         besthash = node.getbestblockhash()
