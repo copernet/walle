@@ -24,7 +24,7 @@ class NamedArgumentTest(BitcoinTestFramework):
         h = node.help(command='getinfo')
         assert(h.startswith('getinfo\n'))
 
-        # -32602 is Standard JSON-RPC 2.0 errors
+        # -32602 is Standard JSON-RPC 2.0 error
         assert_raises_rpc_error(-32602, 'Unknown named parameter',
                                 node.help, random='getinfo')
 
