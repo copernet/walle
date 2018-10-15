@@ -7,7 +7,7 @@
 from collections import deque
 from enum import Enum
 import logging
-import argparse 
+import argparse
 import os
 import pdb
 import shutil
@@ -251,8 +251,8 @@ class BitcoinTestFramework():
         assert_equal(len(extra_args), num_nodes)
         assert_equal(len(binary), num_nodes)
         for i in range(num_nodes):
-            self.nodes.append(TestNode(i, self.options.tmpdir, extra_args[i], rpchost, 
-                                        timewait=timewait, binary=binary[i], stderr=None, 
+            self.nodes.append(TestNode(i, self.options.tmpdir, extra_args[i], rpchost,
+                                        timewait=timewait, binary=binary[i], stderr=None,
                                         mocktime=self.mocktime, coverage_dir=self.options.coveragedir,
                                         network=self.options.network
                                        ))
@@ -340,6 +340,13 @@ class BitcoinTestFramework():
         Join the (previously split) network halves together.
         """
         connect_nodes_bi(self.nodes, 1, 2)
+
+        # todo after copernicus add header-first,remove this
+        # update node1's sync peer to sync node0 block
+        disconnect_nodes(self.nodes[1], 0)
+        disconnect_nodes(self.nodes[0], 1)
+        connect_nodes_bi(self.nodes, 1, 0)
+        
         self.sync_all()
 
     def sync_all(self, node_groups=None):
