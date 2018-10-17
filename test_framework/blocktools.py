@@ -13,6 +13,9 @@ from .util import satoshi_round
 
 
 def create_block(hashprev, coinbase, nTime=None):
+    return create_block_with_txns(hashprev, [coinbase], nTime)
+
+def create_block_with_txns(hashprev, txns, nTime=None):
     block = CBlock()
     if nTime is None:
         import time
@@ -21,7 +24,7 @@ def create_block(hashprev, coinbase, nTime=None):
         block.nTime = nTime
     block.hashPrevBlock = hashprev
     block.nBits = 0x207fffff  # Will break after a difficulty adjustment...
-    block.vtx.append(coinbase)
+    block.vtx.extend(txns)
     block.hashMerkleRoot = block.calc_merkle_root()
     block.calc_sha256()
     return block
