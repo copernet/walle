@@ -94,7 +94,7 @@ class TestNode():
         self.args.append('--datadir')
         self.args.append(self.datadir)
 
-        self.process = subprocess.Popen(self.args, stdout=open(os.devnull, 'w'), stderr=stderr)
+        self.process = subprocess.Popen(self.args + extra_args, stdout=open(os.devnull, 'w'), stderr=stderr)
         self.running = True
         self.log.debug("bitcoind started, waiting for RPC to come up")
 
