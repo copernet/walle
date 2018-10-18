@@ -66,7 +66,7 @@ class ExampleTest(BitcoinTestFramework):
         self.log.info("#4. create another fork chain with two blocks")
         self.tip = self.fork_point_hash
         self.height = self.fork_height
-        for i in range(1):
+        for i in range(2):
             input_txn = self.coinbase_txs[i]
             outputValue = int(input_txn.vout[0].nValue / 5)
             txn = create_transaction(input_txn, 0, b'', outputValue)
@@ -74,8 +74,7 @@ class ExampleTest(BitcoinTestFramework):
             self.create_block_and_send([create_coinbase(self.height), txn], node0)
 
         self.log.info("#5. expect node0 switch to new chain")
-        time.sleep(20)
-        self.nodes[0].waitforblockheight(102)
+        self.nodes[0].waitforblockheight(103)
 
     def create_block_and_send(self, txs, node):
         block = create_block_with_txns(self.tip, txs, self.block_time)
