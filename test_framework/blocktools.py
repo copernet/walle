@@ -50,7 +50,7 @@ def serialize_script_num(value):
 # otherwise an anyone-can-spend output.
 
 
-def create_coinbase(height, pubkey=None):
+def create_coinbase(height, pubkey=None, block_fee=0):
     coinbase = CTransaction()
     coinbase.vin.append(CTxIn(COutPoint(0, 0xffffffff),
                               ser_string(serialize_script_num(height)), 0xffffffff))
@@ -58,6 +58,7 @@ def create_coinbase(height, pubkey=None):
     coinbaseoutput.nValue = 50 * COIN
     halvings = int(height / 150)  # regtest
     coinbaseoutput.nValue >>= halvings
+    coinbaseoutput.nValue += block_fee
     if (pubkey != None):
         coinbaseoutput.scriptPubKey = CScript([pubkey, OP_CHECKSIG])
     else:
