@@ -56,7 +56,7 @@ class ExampleTest(BitcoinTestFramework):
 
         self.log.info("#3. create one fork chain with one block=======================================================")
         for i in range(1):
-            block_fee, txns = self.create_txns_from(self.coinbase_txs[i], 99)
+            block_fee, txns = self.create_txns_from(self.coinbase_txs[i], 2)
             coinbase = create_coinbase(self.height, None, block_fee)
             self.create_block_and_send([coinbase] + txns, node0)
 
@@ -67,7 +67,7 @@ class ExampleTest(BitcoinTestFramework):
         self.height = self.fork_height
 
         for i in range(2):
-            block_fee, txns = self.create_txns_from(self.coinbase_txs[i], 99)
+            block_fee, txns = self.create_txns_from(self.coinbase_txs[i], 2)
             coinbase = create_coinbase(self.height, None, block_fee)
             self.create_block_and_send([coinbase] + txns, node0)
 
@@ -83,9 +83,9 @@ class ExampleTest(BitcoinTestFramework):
         txn_output_values = [ txn_input_values[i] - tx_fee for i in range(num)]
         block_fee = sum(txn_input_values) - sum(txn_output_values)
 
-        txns = [create_transaction(input_txn, 0, b'', txn_output_values[0])]
+        txns = [create_transaction(input_txn, 0, b'', txn_output_values[0], CScript([OP_TRUE]))]
         for i in range(1, num):
-            txn = create_transaction(txns[i - 1], 0, b'', txn_output_values[i])
+            txn = create_transaction(txns[i - 1], 0, b'', txn_output_values[i], CScript([OP_TRUE]))
             txns.append(txn)
 
         return block_fee, txns
