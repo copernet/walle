@@ -83,11 +83,9 @@ class ExampleTest(BitcoinTestFramework):
         txn_output_values = [ txn_input_values[i] - tx_fee for i in range(num)]
         block_fee = sum(txn_input_values) - sum(txn_output_values)
 
-        script_pub_key = CScript([OP_TRUE])
-
-        txns = [create_transaction(input_txn, 0, b'', txn_output_values[0], script_pub_key)]
+        txns = [create_transaction(input_txn, 0, b'', txn_output_values[0])]
         for i in range(1, num):
-            txn = create_transaction(txns[i - 1], 0, b'', txn_output_values[i], script_pub_key)
+            txn = create_transaction(txns[i - 1], 0, b'', txn_output_values[i])
             txns.append(txn)
 
         return block_fee, txns
