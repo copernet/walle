@@ -13,6 +13,7 @@ from test_framework.mininode import (
     NodeConnCB,
     msg_block,
 )
+from test_framework.script import CScript, OP_TRUE
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
     p2p_port,
@@ -34,7 +35,7 @@ class ExampleTest(BitcoinTestFramework):
         NetworkThread().start()
         node0.wait_for_verack()
 
-        self.log.info("#1. generate 1 block by node0")
+        self.log.info("#1. generate 1 block by node0==================================================================")
         self.nodes[0].generate(nblocks=1)
         self.tip = int(self.nodes[0].getbestblockhash(), 16)
         self.block_time = self.nodes[0].getblock(self.nodes[0].getbestblockhash())['time'] + 1
@@ -42,7 +43,7 @@ class ExampleTest(BitcoinTestFramework):
         self.height = 1
         self.coinbase_txs = []
 
-        self.log.info("#2. create 100 blocks and send to node0")
+        self.log.info("#2. create 100 blocks and send to node0========================================================")
         for i in range(100):
             coinbase_tx = create_coinbase(self.height)
             self.coinbase_txs.append(coinbase_tx)
@@ -53,28 +54,43 @@ class ExampleTest(BitcoinTestFramework):
         self.fork_point_hash = self.tip
         self.fork_height = self.height
 
-        self.log.info("#3. create one fork chain with one block")
+        self.log.info("#3. create one fork chain with one block=======================================================")
         for i in range(1):
-            input_txn = self.coinbase_txs[i]
-            outputValue = int(input_txn.vout[0].nValue / 5)
-            txn = create_transaction(input_txn, 0, b'', outputValue)
-
-            self.create_block_and_send([create_coinbase(self.height), txn], node0)
+            block_fee, txns = self.create_txns_from(self.coinbase_txs[i], 99)
+            coinbase = create_coinbase(self.height, None, block_fee)
+            self.create_block_and_send([coinbase] + txns, node0)
 
         self.nodes[0].waitforblockheight(102)
 
-        self.log.info("#4. create another fork chain with two blocks")
+        self.log.info("#4. create another fork chain with two blocks==================================================")
         self.tip = self.fork_point_hash
         self.height = self.fork_height
+
         for i in range(2):
-            input_txn = self.coinbase_txs[i]
-            outputValue = int(input_txn.vout[0].nValue / 5)
-            txn = create_transaction(input_txn, 0, b'', outputValue)
+            block_fee, txns = self.create_txns_from(self.coinbase_txs[i], 99)
+            coinbase = create_coinbase(self.height, None, block_fee)
+            self.create_block_and_send([coinbase] + txns, node0)
 
-            self.create_block_and_send([create_coinbase(self.height), txn], node0)
-
-        self.log.info("#5. expect node0 switch to new chain")
+        self.log.info("#5. expect node0 switch to new chain===========================================================")
         self.nodes[0].waitforblockheight(103)
+
+    def create_txns_from(self, input_txn, num=1):
+        input_value = input_txn.vout[0].nValue
+        tx_fee = 10000
+        assert (num * tx_fee <= input_value)
+
+        txn_input_values = [ input_value - i*tx_fee for i in range(num)]
+        txn_output_values = [ txn_input_values[i] - tx_fee for i in range(num)]
+        block_fee = sum(txn_input_values) - sum(txn_output_values)
+
+        script_pub_key = CScript([OP_TRUE])
+
+        txns = [create_transaction(input_txn, 0, b'', txn_output_values[0], script_pub_key)]
+        for i in range(1, num):
+            txn = create_transaction(txns[i - 1], 0, b'', txn_output_values[i], script_pub_key)
+            txns.append(txn)
+
+        return block_fee, txns
 
     def create_block_and_send(self, txs, node):
         block = create_block_with_txns(self.tip, txs, self.block_time)
@@ -84,6 +100,7 @@ class ExampleTest(BitcoinTestFramework):
         self.log.info("height %d, hash: %s", self.height, self.tip)
         self.block_time += 1
         self.height += 1
+
 
 if __name__ == '__main__':
     ExampleTest().main()
