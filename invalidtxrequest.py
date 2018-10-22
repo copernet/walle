@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 from test_framework.test_framework import ComparisonTestFramework
-from test_framework.comptool import TestManager, TestInstance, RejectResult
+from test_framework.comptool import TestManager, TestInstance, RejectResult, RejectInvalid, RejectNonstandard
 from test_framework.blocktools import *
 import time
 
@@ -70,10 +70,30 @@ class InvalidTxRequestTest(ComparisonTestFramework):
         # Transaction will be rejected with code 16 (REJECT_INVALID)
         tx1 = create_transaction(
             self.block1.vtx[0], 0, b'\x64', 50 * COIN - 12000)
-        yield TestInstance([[tx1, RejectResult(16, b'mandatory-script-verify-flag-failed')]])
+        yield TestInstance([[tx1, RejectResult(RejectInvalid, b'mandatory-script-verify-flag-failed')]])
 
+        self.log.debug("[tx_check 001] should reject coinbase tx -----------------------------------------------------")
+        # Transaction will be rejected with code 16 (REJECT_INVALID)
+        tx1 = create_coinbase(0)
+        yield TestInstance([[tx1, RejectResult(RejectInvalid, b'bad-tx-coinbase')]])
+
+        self.log.debug("[tx_check 002] should reject non final tx ----------------------------------------------------")
+        # Transaction will be rejected with code 16 (REJECT_INVALID)
+        tx1 = create_transaction(self.block1.vtx[0], 0, b'', 50 * COIN - 200)
+        tx1.nLockTime = 5000000     #high lock height
+        tx1.vin[0].nSequence = 0    #not final sequence
+        tx1.rehash()
+        yield TestInstance([[tx1, RejectResult(RejectNonstandard, b'bad-txns-nonfinal')]])
+
+        # self.log.debug("[tx_check 003] should reject tx whose input has already spent in mempool ---------------------")
+        # # Transaction will be rejected with code 16 (REJECT_INVALID)
+        # tx1 = create_transaction(self.block1.vtx[0], 0, b'\x51', 50 * COIN - 300)
+        # yield TestInstance([[tx1, True]])
+        # tx2 = create_transaction(tx1, 0, b'\x51', 50 * COIN - 300 - 100)
+        # yield TestInstance([[tx2, True]])
+
+        self.log.debug("[tx_check finished] --------------------------------------------------------------------------")
         # TODO: test further transactions...
-
 
 if __name__ == '__main__':
     InvalidTxRequestTest().main()

@@ -393,7 +393,7 @@ PProf:
   IP:
   Port: "{str(n + 6060)}"
 '''
-    with open(os.path.join(datadir, "conf.yml"), 'w', encoding='utf8') as f:
+    with open(os.path.join(datadir, "bitcoincash.yml"), 'w', encoding='utf8') as f:
         f.write(content)
     return datadir
 

@@ -43,7 +43,7 @@ class TestNode():
     def __init__(self, i, dirname, extra_args, rpchost, timewait, binary, stderr, mocktime, coverage_dir, network):
         self.index = i
         self.datadir = os.path.join(dirname, "node" + str(i))
-        with open(os.path.join(self.datadir, network, 'conf.yml')) as f:
+        with open(os.path.join(self.datadir, network, 'bitcoincash.yml')) as f:
             self.configData = yaml.load(f)
 
         if rpchost is None:
