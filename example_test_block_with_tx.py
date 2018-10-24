@@ -240,7 +240,7 @@ class ExampleTest(BitcoinTestFramework):
         # wait_until() will loop until a predicate condition is met. Use it to test properties of the
         # NodeConnCB objects.
         wait_until(lambda: sorted(blocks) == sorted(
-            list(node2.block_receive_map.keys())), timeout=5, lock=mininode_lock)
+            list(node2.block_receive_map.keys())), timeout=30, lock=mininode_lock)
 
         self.log.info("Check that each block was received only once")
         # The network thread uses a global lock on data access to the NodeConn objects when sending and receiving
