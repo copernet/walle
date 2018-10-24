@@ -8,4 +8,4 @@ before_install:
   - docker build -t copernet/copernicus .
 
 script:
-  - docker run copernet/copernicus pipenv run python /walle/example_test.py
+  - docker run copernet/copernicus /bin/bash -c 'cd /walle && pipenv run python test_runner.py'
