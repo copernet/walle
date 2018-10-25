@@ -85,6 +85,22 @@ class InvalidTxRequestTest(ComparisonTestFramework):
         tx1.rehash()
         yield TestInstance([[tx1, RejectResult(RejectNonstandard, b'bad-txns-nonfinal')]])
 
+        self.log.debug("[tx_check 003] should reject tx whose input has already spent in mempool ---------------------")
+        # Transaction will be rejected with code 16 (REJECT_INVALID)
+        tx1 = create_transaction(self.block1.vtx[0], 0, b'\x51', 50 * COIN - 300)
+        yield TestInstance([[tx1, RejectResult(RejectNonstandard, b'non-mandatory-script-verify-flag (Script did not clean its stack)')]])
+
+        self.log.debug("[tx_check 004-0] should reject tx whose input has already spent in mempool ---------------------")
+        self.log.debug("          004-1 --------------------- create a transaction tx1 with output")
+        tx1 = create_transaction(self.block1.vtx[0], 0, b'', 50 * COIN - 300, CScript([OP_TRUE]))
+        yield TestInstance([[tx1, True]])
+        self.log.debug("          004-2 --------------------- spend output of tx1")
+        tx2 = create_transaction(tx1, 0, b'', 50 * COIN - 300 - 100)
+        yield TestInstance([[tx2, True]])
+        self.log.debug("          004-3 --------------------- try spend output of tx1 again")
+        tx3 = create_transaction(tx1, 0, b'', 50 * COIN - 300 - 200)
+        yield TestInstance([[tx3, False]])
+
         self.log.debug("[tx_check finished] --------------------------------------------------------------------------")
         # TODO: test further transactions...
 
