@@ -255,8 +255,14 @@ def run_tests(test_list, build_dir, tests_dir, junitouput, exeext, tmpdir, jobs=
 
     if len(test_list) > 1 and jobs > 1:
         # Populate cache
-        subprocess.check_output(
-            [os.path.join(tests_dir, 'create_cache.py')] + flags + [os.path.join("--tmpdir=%s", "cache") % tmpdir])
+        create_cache_py = [os.path.join(tests_dir, 'create_cache.py')] + flags + [os.path.join("--tmpdir=%s", "cache") % tmpdir]
+        try:
+            subprocess.check_output(create_cache_py)
+        except Exception:
+            try:
+                subprocess.check_output(create_cache_py)
+            except Exception:
+                subprocess.check_output(create_cache_py)
 
     # Run Tests
     job_queue = TestHandler(jobs, tests_dir, tmpdir, test_list, flags)
