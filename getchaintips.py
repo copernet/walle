@@ -47,14 +47,14 @@ class GetChainTipsTest (BitcoinTestFramework):
         self.join_network()
 
         tips = self.nodes[0].getchaintips()['Tips']
-        # assert_equal(len(tips), 2)
-        # assert_equal(tips[0], longTip)
-        #
-        # assert_equal(tips[1]['branchlen'], 10)
-        # assert_equal(tips[1]['status'], 'valid-fork')
-        # tips[1]['branchlen'] = 0
-        # tips[1]['status'] = 'active'
-        #assert_equal(tips[1], shortTip)
+        assert_equal(len(tips), 2)
+        assert_equal(tips[0], longTip)
+
+        assert_equal(tips[1]['branchlen'], 10)
+        assert_equal(tips[1]['status'], 'valid-fork')
+        tips[1]['branchlen'] = 0
+        tips[1]['status'] = 'active'
+        assert_equal(tips[1], shortTip)
 
 
 if __name__ == '__main__':
