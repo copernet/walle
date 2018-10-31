@@ -261,10 +261,10 @@ def run_tests(test_list, build_dir, tests_dir, junitouput, exeext, tmpdir, jobs=
             subprocess.check_output(create_cache_py)
         except Exception:
             try:
-                os.removedirs()
+                os.removedirs(cache_tmpdir)
                 subprocess.check_output(create_cache_py)
             except Exception:
-                os.removedirs()
+                os.removedirs(cache_tmpdir)
                 subprocess.check_output(create_cache_py)
 
     # Run Tests
