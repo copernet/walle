@@ -194,7 +194,7 @@ class ReplayProtectionTest(ComparisonTestFramework):
         block(2)
         update_block(2, replay_txns)
         yield rejected(RejectResult(16, b'blk-bad-inputs'))
-        return
+
         # Rewind bad block
         tip(1)
 
@@ -259,7 +259,7 @@ class ReplayProtectionTest(ComparisonTestFramework):
         b5 = block(5)
         update_block(5, replay_txns)
         yield accepted()
-
+        return
         # Ok, now we check if a reorg work properly accross the activation.
         postforkblockid = node.getbestblockhash()
         node.invalidateblock(postforkblockid)
