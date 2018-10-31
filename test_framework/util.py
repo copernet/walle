@@ -396,6 +396,10 @@ TxOut:
 PProf:
   IP:
   Port: "{str(n + 6060)}"
+
+Wallet:
+  Enable: true
+  Broadcast: true
 '''
     with open(os.path.join(datadir, "bitcoincash.yml"), 'w', encoding='utf8') as f:
         f.write(content)
