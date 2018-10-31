@@ -457,8 +457,8 @@ class BitcoinTestFramework():
             self.stop_nodes()
             self.nodes = []
             self.disable_mocktime()
-            for i in range(MAX_NODES):
-                shutil.rmtree(log_filename(self.options.cachedir, i, "logs"))
+            # for i in range(MAX_NODES):
+                # shutil.rmtree(log_filename(self.options.cachedir, i, "logs"))
 
         for i in range(self.num_nodes):
             from_dir = os.path.join(self.options.cachedir, "node" + str(i))
