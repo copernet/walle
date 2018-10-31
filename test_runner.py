@@ -255,13 +255,16 @@ def run_tests(test_list, build_dir, tests_dir, junitouput, exeext, tmpdir, jobs=
 
     if len(test_list) > 1 and jobs > 1:
         # Populate cache
-        create_cache_py = [os.path.join(tests_dir, 'create_cache.py')] + flags + [os.path.join("--tmpdir=%s", "cache") % tmpdir]
+        cache_tmpdir = os.path.join("--tmpdir=%s", "cache") % tmpdir
+        create_cache_py = [os.path.join(tests_dir, 'create_cache.py')] + flags + [cache_tmpdir]
         try:
             subprocess.check_output(create_cache_py)
         except Exception:
             try:
+                os.removedirs()
                 subprocess.check_output(create_cache_py)
             except Exception:
+                os.removedirs()
                 subprocess.check_output(create_cache_py)
 
     # Run Tests
