@@ -20,7 +20,7 @@ from test_framework.util import (
 )
 
 
-class ExampleTest(BitcoinTestFramework):
+class SingleNodeUndoTest(BitcoinTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 1
@@ -101,4 +101,4 @@ class ExampleTest(BitcoinTestFramework):
 
 
 if __name__ == '__main__':
-    ExampleTest().main()
+    SingleNodeUndoTest().main()
