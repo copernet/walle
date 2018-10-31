@@ -119,6 +119,7 @@ class BitcoinTestFramework():
         # Set up temp directory and start logging
         if self.options.tmpdir:
             self.options.tmpdir = os.path.abspath(self.options.tmpdir)
+            shutil.rmtree(self.options.tmpdir, ignore_errors=True)
             os.makedirs(self.options.tmpdir, exist_ok=False)
         else:
             self.options.tmpdir = tempfile.mkdtemp(prefix="test")

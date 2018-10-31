@@ -261,10 +261,10 @@ def run_tests(test_list, build_dir, tests_dir, junitouput, exeext, tmpdir, jobs=
             subprocess.check_output(create_cache_py)
         except Exception:
             try:
-                shutil.rmtree(cache_tmpdir, True)
+                shutil.rmtree(cache_tmpdir, ignore_errors=True)
                 subprocess.check_output(create_cache_py)
             except Exception:
-                shutil.rmtree(cache_tmpdir, True)
+                shutil.rmtree(cache_tmpdir, ignore_errors=True)
                 subprocess.check_output(create_cache_py)
 
     # Run Tests
