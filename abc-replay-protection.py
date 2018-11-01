@@ -259,7 +259,7 @@ class ReplayProtectionTest(ComparisonTestFramework):
         b5 = block(5)
         update_block(5, replay_txns)
         yield accepted()
-        return
+
         # Ok, now we check if a reorg work properly accross the activation.
         postforkblockid = node.getbestblockhash()
         node.invalidateblock(postforkblockid)
