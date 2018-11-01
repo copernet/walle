@@ -35,7 +35,7 @@ from test_framework.util import (
 class BlockchainTest(BitcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
-        self.extra_args = [['-stopatheight=207']]
+        self.extra_args = [['--stopatheight=207']]
 
     def run_test(self):
         self._test_getchaintxstats()
@@ -43,9 +43,8 @@ class BlockchainTest(BitcoinTestFramework):
         self._test_getblockheader()
         self._test_getdifficulty()
         self._test_getnetworkhashps()
-        # TODO: NOT support mode '-stopatheight'
-        #self._test_stopatheight()
-        # TODO: NOT support verifychain yet
+        self._test_stopatheight()
+        #TODO: NOT support verifychain yet
         #assert self.nodes[0].verifychain(4, 0)
 
     def _test_getchaintxstats(self):
@@ -89,7 +88,7 @@ class BlockchainTest(BitcoinTestFramework):
         assert_equal(res['height'], 200)
         assert_equal(res['txouts'], 200)
         # TODO: NOT support wallet yet
-        #assert_equal(res['bogosize'], 17000),
+        #assert_equal(res['bogosize'], 17000)
         assert_equal(res['bestblock'], node.getblockhash(200))
         size = res['disk_size']
         assert size > 6400
@@ -179,6 +178,4 @@ class BlockchainTest(BitcoinTestFramework):
 
 
 if __name__ == '__main__':
-    #TODO: fix this later
-    #BlockchainTest().main()
-    pass
+    BlockchainTest().main()
