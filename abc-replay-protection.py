@@ -271,10 +271,10 @@ class ReplayProtectionTest(ComparisonTestFramework):
         assert(replay_tx_id not in set(node.getrawmempool()))
 
         # Check that we also do it properly on deeper reorg.
-        #node.reconsiderblock(forkblockid)
-        #node.reconsiderblock(postforkblockid)
-        #node.invalidateblock(forkblockid)
-        #assert(replay_tx_id not in set(node.getrawmempool()))
+        node.reconsiderblock(forkblockid)
+        node.reconsiderblock(postforkblockid)
+        node.invalidateblock(forkblockid)
+        assert(replay_tx_id not in set(node.getrawmempool()))
 
 
 if __name__ == '__main__':
