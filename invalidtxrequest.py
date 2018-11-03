@@ -83,7 +83,7 @@ class InvalidTxRequestTest(ComparisonTestFramework):
         tx1.nLockTime = 5000000     #high lock height
         tx1.vin[0].nSequence = 0    #not final sequence
         tx1.rehash()
-        yield TestInstance([[tx1, RejectResult(RejectNonstandard, b'bad-txns-nonfinal')]])
+        yield TestInstance([[tx1, RejectResult(RejectInvalid, b'bad-txns-nonfinal')]])
 
         self.log.debug("[tx_check 003] should reject tx whose input has already spent in mempool ---------------------")
         # Transaction will be rejected with code 16 (REJECT_INVALID)
