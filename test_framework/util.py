@@ -356,7 +356,7 @@ Mempool:
 Mining:
   BlockMinTxFee: 100
   BlockMaxSize: 2000000
-  BlockVersion: 1
+  BlockVersion: -1
   Strategy: ancestorfeerate
 Chain:
   AssumeValid:
