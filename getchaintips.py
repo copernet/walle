@@ -16,7 +16,7 @@ class GetChainTipsTest (BitcoinTestFramework):
         self.num_nodes = 4
 
     def run_test(self):
-        tips = self.nodes[0].getchaintips()['Tips']
+        tips = self.nodes[0].getchaintips()
         assert_equal(len(tips), 1)
         assert_equal(tips[0]['branchlen'], 0)
         assert_equal(tips[0]['height'], 200)
@@ -28,14 +28,14 @@ class GetChainTipsTest (BitcoinTestFramework):
         self.nodes[2].generate(20)
         self.sync_all([self.nodes[:2], self.nodes[2:]])
 
-        tips = self.nodes[1].getchaintips()['Tips']
+        tips = self.nodes[1].getchaintips()
         assert_equal(len(tips), 1)
         shortTip = tips[0]
         assert_equal(shortTip['branchlen'], 0)
         assert_equal(shortTip['height'], 210)
         assert_equal(tips[0]['status'], 'active')
 
-        tips = self.nodes[3].getchaintips()['Tips']
+        tips = self.nodes[3].getchaintips()
         assert_equal(len(tips), 1)
         longTip = tips[0]
         assert_equal(longTip['branchlen'], 0)
@@ -46,7 +46,7 @@ class GetChainTipsTest (BitcoinTestFramework):
         # (at least at the nodes that previously had the short chain).
         self.join_network()
 
-        tips = self.nodes[0].getchaintips()['Tips']
+        tips = self.nodes[0].getchaintips()
         assert_equal(len(tips), 2)
         assert_equal(tips[0], longTip)
 
