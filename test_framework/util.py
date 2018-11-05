@@ -376,7 +376,7 @@ P2PNet:
   DisableTLS: true
   UserAgentComments: "testnode{str(n)}"
 
-Protocal:
+Protocol:
   NoPeerBloomFilters: true
   DisableCheckpoints: true
 
