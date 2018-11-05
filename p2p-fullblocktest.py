@@ -69,6 +69,10 @@ class FullBlockTest(ComparisonTestFramework):
         self.tip = None
         self.blocks = {}
 
+    def setup_nodes(self):
+        self.add_nodes(self.num_nodes, self.extra_args, timewait=300)
+        self.start_nodes()
+
     def add_options(self, parser):
         super().add_options(parser)
         parser.add_argument(
