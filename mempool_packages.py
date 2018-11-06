@@ -86,7 +86,6 @@ class MempoolPackagesTest(BitcoinTestFramework):
                 self.nodes[0].getmempoolancestors(x)))
 
         # Check that getmempoolancestors/getmempooldescendants correctly handle verbose=true
-        c = chain[-1]
         v_ancestors = self.nodes[0].getmempoolancestors(chain[-1], True)
         assert_equal(len(v_ancestors), len(chain) - 1)
         for x in v_ancestors.keys():
@@ -94,7 +93,6 @@ class MempoolPackagesTest(BitcoinTestFramework):
         assert(chain[-1] not in v_ancestors.keys())
 
         v_descendants = self.nodes[0].getmempooldescendants(chain[0], True)
-        l = len(chain)
         assert_equal(len(v_descendants), len(chain) - 1)
         for x in v_descendants.keys():
             assert_equal(mempool[x], v_descendants[x])
