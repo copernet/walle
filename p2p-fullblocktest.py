@@ -1326,5 +1326,4 @@ class FullBlockTest(ComparisonTestFramework):
 
 
 if __name__ == '__main__':
-    #FullBlockTest().main()
-    pass
+    FullBlockTest().main()
