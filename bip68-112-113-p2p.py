@@ -612,5 +612,4 @@ class BIP68_112_113Test(ComparisonTestFramework):
 
 
 if __name__ == '__main__':
-    #BIP68_112_113Test().main()
-    pass
+    BIP68_112_113Test().main()
