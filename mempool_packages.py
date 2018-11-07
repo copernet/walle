@@ -15,8 +15,8 @@ MAX_DESCENDANTS = 25
 class MempoolPackagesTest(BitcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
-        self.extra_args = [["-maxorphantx=1000"],
-                           ["-maxorphantx=1000", "-limitancestorcount=5"]]
+        self.extra_args = [["--maxorphantx=1000"],
+                           ["--maxorphantx=1000", "--limitancestorcount=5"]]
 
     # Build a transaction that spends parent_txid:vout
     # Return amount sent
