@@ -69,10 +69,6 @@ class FullBlockTest(ComparisonTestFramework):
         self.tip = None
         self.blocks = {}
 
-    def setup_nodes(self):
-        self.add_nodes(self.num_nodes, self.extra_args, timewait=300)
-        self.start_nodes()
-
     def add_options(self, parser):
         super().add_options(parser)
         parser.add_argument(
@@ -291,6 +287,9 @@ class FullBlockTest(ComparisonTestFramework):
         tip(5)
         b12 = block(12, spend=out[3])
         save_spendable_output()
+        #TODO: remove follwing line after added headfirst support
+        yield TestInstance([[b12, False]])
+
         b13 = block(13, spend=out[4])
         # Deliver the block header for b12, and the block b13.
         # b13 should be accepted but the tip won't advance until b12 is
@@ -306,7 +305,7 @@ class FullBlockTest(ComparisonTestFramework):
 
         #TODO: headersFirst
         #yield TestInstance([[b12, True, b13.sha256]])  # New tip should be b13.
-        yield TestInstance([[b12, True], [b13, True]])
+        yield TestInstance([[b13, True]])
 
         # Add a block with MAX_BLOCK_SIGOPS_PER_MB and one with one more sigop
         #     genesis -> b1 (0) -> b2 (1) -> b5 (2) -> b6  (3)
@@ -929,13 +928,11 @@ class FullBlockTest(ComparisonTestFramework):
         tx.vin.append(CTxIn(COutPoint(b64a.vtx[1].sha256, 0)))
         b64a = update_block("64a", [tx])
         assert_equal(len(b64a.serialize()), LEGACY_MAX_BLOCK_SIZE + 8)
-        #TODO: headerFirst model
-        #yield TestInstance([[self.tip, None]])
+        yield TestInstance([[self.tip, None]])
 
         # comptool workaround: to make sure b64 is delivered, manually erase
         # b64a from blockstore
-        #TODO: headerFirst model
-        #self.test.block_store.erase(b64a.sha256)
+        self.test.block_store.erase(b64a.sha256)
 
         tip(60)
         b64 = CBlock(b64a)
@@ -1192,11 +1189,6 @@ class FullBlockTest(ComparisonTestFramework):
         yield rejected()
         save_spendable_output()
 
-        return
-        ###
-        ###remove this return after fix following panic: the transaction children set is different
-        ###
-
         block(81, spend=out[26])
         yield rejected()  # other chain is same length
         save_spendable_output()
@@ -1278,6 +1270,8 @@ class FullBlockTest(ComparisonTestFramework):
         tx = create_tx(tx1, 0, 0, CScript([OP_TRUE]))
         update_block("89a", [tx])
         yield rejected()
+
+        return #TODO: remove this line, after added headersfirst mode support
 
         #  Test re-org of a week's worth of blocks (1088 blocks)
         #  This test takes a minute or two and can be accomplished in memory

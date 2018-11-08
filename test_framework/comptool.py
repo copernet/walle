@@ -20,7 +20,7 @@ TestNode behaves as follows:
 from .mininode import *
 from .blockstore import BlockStore, TxStore
 from .util import p2p_port, wait_until
-
+import inspect
 import logging
 
 logger = logging.getLogger("TestFramework.comptool")
@@ -181,7 +181,9 @@ class TestInstance():
         self.blocks_and_transactions = objects if objects else []
         self.sync_every_block = sync_every_block
         self.sync_every_tx = sync_every_tx
-
+        self.test_at = ""
+        if len(inspect.stack()) >= 5:
+            self.test_at = "%s:%s" % (inspect.stack()[-5][1], inspect.stack()[-5][2])
 
 class TestManager():
 
@@ -289,6 +291,8 @@ class TestManager():
                             c.cb.block_reject_map[blockhash], outcome, blockhash))
                         return False
                 elif ((c.cb.bestblockhash == blockhash) != outcome):
+                    print("expected block hash: %064x, actual bestblockhash %064x, expected outcome %064x"
+                          % (blockhash, c.cb.bestblockhash, outcome))
                     return False
             return True
 
@@ -383,7 +387,7 @@ class TestManager():
                             self.ping_counter += 1
                         if (not self.check_results(tip, outcome)):
                             raise AssertionError(
-                                "Test failed at test %d" % test_number)
+                                "Test failed at test %d [%s]" % (test_number, test_instance.test_at))
                     else:
                         invqueue.append(CInv(2, block.sha256))
                 elif isinstance(b_or_t, CBlockHeader):
@@ -406,7 +410,7 @@ class TestManager():
                         self.sync_transaction(tx.sha256, 1)
                         if (not self.check_mempool(tx.sha256, outcome)):
                             raise AssertionError(
-                                "Test failed at test %d" % test_number)
+                                "Test failed at test %d [%s]" % (test_number, test_instance.test_at))
                     else:
                         invqueue.append(CInv(1, tx.sha256))
                 # Ensure we're not overflowing the inv queue
@@ -425,7 +429,7 @@ class TestManager():
                     test_instance.blocks_and_transactions))
                 if (not self.check_results(tip, block_outcome)):
                     raise AssertionError(
-                        "Block test failed at test %d" % test_number)
+                        "Block test failed at test %d [%s]" % (test_number, test_instance.test_at))
             if (not test_instance.sync_every_tx and tx is not None):
                 if len(invqueue) > 0:
                     [c.send_message(msg_inv(invqueue))
@@ -435,9 +439,9 @@ class TestManager():
                     test_instance.blocks_and_transactions))
                 if (not self.check_mempool(tx.sha256, tx_outcome)):
                     raise AssertionError(
-                        "Mempool test failed at test %d" % test_number)
+                        "Mempool test failed at test %d [%s]" % (test_number, test_instance.test_at))
 
-            logger.info("Test %d: PASS" % test_number)
+            logger.info("Test %d [%s]: PASS" % (test_number, test_instance.test_at))
             test_number += 1
 
         [c.disconnect_node() for c in self.connections]
