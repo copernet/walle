@@ -70,6 +70,10 @@ class BIP65Test(BitcoinTestFramework):
             ['--promiscuousmempoolflags=1', '--whitelist=127.0.0.1']]
         self.setup_clean_chain = True
 
+    def setup_nodes(self):
+        self.add_nodes(self.num_nodes, self.extra_args, timewait=300)
+        self.start_nodes()
+
     def run_test(self):
         node0 = NodeConnCB()
         connections = []
@@ -175,5 +179,4 @@ class BIP65Test(BitcoinTestFramework):
 
 
 if __name__ == '__main__':
-    #BIP65Test().main()
-    pass
+    BIP65Test().main()
