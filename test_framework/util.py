@@ -366,7 +366,7 @@ P2PNet:
   MaxPeers: 128
   TargetOutbound: 8
   ConnectPeersOnStart:
-  DisableBanning: true
+  DisableBanning: false
   SimNet: false
   DisableListen: false
   BlocksOnly: false
