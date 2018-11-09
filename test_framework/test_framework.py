@@ -212,6 +212,11 @@ class BitcoinTestFramework():
     def setup_chain(self):
         """Override this method to customize blockchain setup"""
         self.log.info("Initializing test directory " + self.options.tmpdir)
+        softlink = "/tmp/last_ft_tmp"
+        if os.path.islink(softlink):
+            os.unlink(softlink)
+        os.symlink(self.options.tmpdir, softlink)
+
         if self.setup_clean_chain:
             self._initialize_chain_clean()
         else:
