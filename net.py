@@ -24,8 +24,7 @@ class NetTest(BitcoinTestFramework):
         self.num_nodes = 2
 
     def run_test(self):
-        # TODO
-        # self._test_connection_count()
+        self._test_connection_count()
         # self._test_getnettotals()
         # self._test_getnetworkinginfo()
         # self._test_getaddednodeinfo()
