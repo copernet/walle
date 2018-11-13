@@ -6,4 +6,4 @@ before_install:
   - docker build -t copernet/copernicus .
 
 script:
-  - docker run copernet/copernicus /bin/bash -c 'cd /walle && pipenv run python test_runner.py'
+  - docker run copernet/copernicus /bin/bash -c 'cd /walle && pipenv run python test_runner.py || /bin/bash /walle/log.sh $TRAVIS_JOB_ID'
