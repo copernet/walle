@@ -1,9 +1,6 @@
 #!/bin/bash
 
-dir=`ls $1/test/cache`
-for d in $dir
-do
-	echo --------------------------------------------------------
-	echo $d
-	cat $1/test/cache/$d/regtest/logs/copernicus.log
-done
+jobID=$1
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+containerID=`docker ps | awk '{if(NR==2){print $1}}'`
+docker commit $containerID copernet/copernicus:$jobID
