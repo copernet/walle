@@ -195,6 +195,7 @@ class ExampleTest(BitcoinTestFramework):
 
         self.log.info("Connect node2 and node1")
         connect_nodes(self.nodes[1], 2)
+        self.nodes[2].waitforblockheight(11)
 
         self.log.info("Add P2P connection to node2")
         node2 = BaseNode()
