@@ -64,7 +64,7 @@ class DisconnectBanTest(BitcoinTestFramework):
         self.nodes[1].setban("127.0.0.0/24", "add")
         time.sleep(1)
         # ban for 1 seconds
-        self.nodes[1].setban("192.168.0.1", "add", 2)
+        self.nodes[1].setban("192.168.0.1", "add", 3)
         time.sleep(1)
         # ban for 1000 seconds
         self.nodes[1].setban(
