@@ -179,5 +179,5 @@ class BIP65Test(BitcoinTestFramework):
 
 
 if __name__ == '__main__':
-    #BIP65Test().main()
-    pass
+    BIP65Test().main()
+
