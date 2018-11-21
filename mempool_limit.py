@@ -50,5 +50,5 @@ class MempoolLimitTest(BitcoinTestFramework):
 
 
 if __name__ == '__main__':
-    pass
-    # MempoolLimitTest().main()
+
+    MempoolLimitTest().main()

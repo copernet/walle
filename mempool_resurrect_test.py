@@ -76,5 +76,5 @@ class MempoolCoinbaseTest(BitcoinTestFramework):
 
 
 if __name__ == '__main__':
-    pass
-    # MempoolCoinbaseTest().main()
+
+    MempoolCoinbaseTest().main()
