@@ -69,10 +69,6 @@ class BitcoinTestFramework():
         self.setup_clean_chain = False
         self.nodes = []
         self.mocktime = 0
-        self.set_test_params()
-
-        assert hasattr(
-            self, "num_nodes"), "Test must set self.num_nodes in set_test_params()"
 
     def main(self):
         """Main function. This should not be overridden by the subclass test scripts."""
@@ -104,8 +100,11 @@ class BitcoinTestFramework():
                           help="regtest or testnet")
 
         self.add_options(parser)
-        #(self.options, self.args) = parser.parse_args()
         self.options = parser.parse_args()
+
+        self.set_test_params()
+        assert hasattr(
+            self, "num_nodes"), "Test must set self.num_nodes in set_test_params()"
 
         PortSeed.n = self.options.port_seed
 
@@ -212,7 +211,6 @@ class BitcoinTestFramework():
     def setup_chain(self):
         """Override this method to customize blockchain setup"""
         self.log.info("Initializing test directory " + self.options.tmpdir)
-
         if self.setup_clean_chain:
             self._initialize_chain_clean()
         else:
@@ -303,6 +301,11 @@ class BitcoinTestFramework():
         for node in self.nodes:
             # Wait for nodes to stop
             node.wait_until_stopped()
+
+    def restart_node(self, i, extra_args=None):
+        """Stop and start a test node"""
+        self.stop_node(i)
+        self.start_node(i, extra_args)
 
     def assert_start_raises_init_error(self, i, extra_args=None, expected_msg=None):
         with tempfile.SpooledTemporaryFile(max_size=2**16) as log_stderr:

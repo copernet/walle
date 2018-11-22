@@ -25,14 +25,20 @@ logger = logging.getLogger("TestFramework.utils")
 ##################
 
 
-def assert_fee_amount(fee, tx_size, fee_per_kB):
-    """Assert the fee was in range"""
+def assert_fee_amount(fee, tx_size, fee_per_kB, wiggleroom=2):
+    """
+    Assert the fee was in range
+
+    wiggleroom defines an amount that the test expects the wallet to be off by
+    when estimating fees.  This can be due to the dummy signature that is added
+    during fee calculation, or due to the wallet funding transactions using the
+    ceiling of the calculated fee.
+    """
     target_fee = tx_size * fee_per_kB / 1000
-    if fee < target_fee:
+    if fee < (tx_size - wiggleroom) * fee_per_kB / 1000:
         raise AssertionError(
             "Fee of %s BTC too low! (Should be %s BTC)" % (str(fee), str(target_fee)))
-    # allow the wallet's estimation to be at most 2 bytes off
-    if fee > (tx_size + 2) * fee_per_kB / 1000:
+    if fee > (tx_size + wiggleroom) * fee_per_kB / 1000:
         raise AssertionError(
             "Fee of %s BTC too high! (Should be %s BTC)" % (str(fee), str(target_fee)))
 
@@ -162,12 +168,12 @@ def assert_is_hash_string(string, length=64):
 
 def assert_array_result(object_array, to_match, expected, should_not_find=False):
     """
-        Pass in array of JSON objects, a dictionary with key/value pairs
-        to match against, and another dictionary with expected key/value
-        pairs.
-        If the should_not_find flag is true, to_match should not be found
-        in object_array
-        """
+    Pass in array of JSON objects, a dictionary with key/value pairs
+    to match against, and another dictionary with expected key/value
+    pairs.
+    If the should_not_find flag is true, to_match should not be found
+    in object_array
+    """
     if should_not_find:
         assert_equal(expected, {})
     num_matched = 0
