@@ -95,7 +95,6 @@ class SingleNodeUndoTest(BitcoinTestFramework):
         block.solve()
         node.send_message(msg_block(block))
         self.tip = block.sha256
-        self.log.info("height %d, hash: %s", self.height, self.tip)
         self.block_time += 1
         self.height += 1
 
