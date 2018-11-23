@@ -17,6 +17,9 @@ from io import BytesIO
 
 CLTV_HEIGHT = 1351
 
+# far in the future
+MAGNETIC_ANOMALY_START_TIME = 2000000000
+
 # Reject codes that we might receive in this test
 REJECT_INVALID = 16
 REJECT_OBSOLETE = 17
@@ -33,6 +36,7 @@ def cltv_invalidate(tx):
     '''
     tx.vin[0].scriptSig = CScript([OP_1NEGATE, OP_CHECKLOCKTIMEVERIFY, OP_DROP] +
                                   list(CScript(tx.vin[0].scriptSig)))
+    tx.rehash()
 
 
 def cltv_validate(node, tx, height):
@@ -67,12 +71,8 @@ class BIP65Test(BitcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.extra_args = [
-            ['--promiscuousmempoolflags=1', '--whitelist=127.0.0.1']]
+            ['--promiscuousmempoolflags=1', '--whitelist=127.0.0.1', '--magneticanomalyactivationtime=%d' % MAGNETIC_ANOMALY_START_TIME]]
         self.setup_clean_chain = True
-
-    def setup_nodes(self):
-        self.add_nodes(self.num_nodes, self.extra_args, timewait=300)
-        self.start_nodes()
 
     def run_test(self):
         node0 = NodeConnCB()
@@ -94,9 +94,11 @@ class BIP65Test(BitcoinTestFramework):
             "Test that an invalid-according-to-CLTV transaction can still appear in a block")
 
         spendtx = create_transaction(self.nodes[0], self.coinbase_blocks[0],
-                                     self.nodeaddress, 1.0)
+                                     self.nodeaddress, 50.0)
         cltv_invalidate(spendtx)
-        spendtx.rehash()
+
+        # Make sure the tx is valid
+        self.nodes[0].sendrawtransaction(bytes_to_hex_str(spendtx.serialize()))
 
         tip = self.nodes[0].getbestblockhash()
         block_time = self.nodes[0].getblockheader(tip)['mediantime'] + 1
@@ -135,7 +137,6 @@ class BIP65Test(BitcoinTestFramework):
         spendtx = create_transaction(self.nodes[0], self.coinbase_blocks[1],
                                      self.nodeaddress, 1.0)
         cltv_invalidate(spendtx)
-        spendtx.rehash()
 
         # First we show that this tx is valid except for CLTV by getting it
         # accepted to the mempool (which we can achieve with
@@ -180,4 +181,3 @@ class BIP65Test(BitcoinTestFramework):
 
 if __name__ == '__main__':
     BIP65Test().main()
-
