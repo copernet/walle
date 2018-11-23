@@ -6,7 +6,8 @@
 # Avoid wildcard * imports if possible
 import time
 
-from test_framework.blocktools import (create_coinbase, create_transaction, create_block_with_txns)
+from test_framework.blocktools import (create_coinbase, create_transaction, create_block_with_txns,
+                                       make_conform_to_ctor)
 from test_framework.mininode import (
     NetworkThread,
     NodeConn,
@@ -92,6 +93,9 @@ class SingleNodeUndoTest(BitcoinTestFramework):
 
     def create_block_and_send(self, txs, node):
         block = create_block_with_txns(self.tip, txs, self.block_time)
+        make_conform_to_ctor(block)
+        block.hashMerkleRoot = block.calc_merkle_root()
+        block.calc_sha256()
         block.solve()
         node.send_message(msg_block(block))
         self.tip = block.sha256
