@@ -627,7 +627,7 @@ class FullBlockTest(ComparisonTestFramework):
         block(42, spend=out[12])
         yield rejected()
         save_spendable_output()
-        return
+
         block(43, spend=out[13])
         yield accepted()
         save_spendable_output()
@@ -727,7 +727,9 @@ class FullBlockTest(ComparisonTestFramework):
         tip(44)
         b52 = block(52, spend=out[15])
         b52 = update_block(52, [b52.vtx[1]])
-        yield rejected(RejectResult(16, b'tx-duplicate'))
+        # TODO: check sequence
+        #yield rejected(RejectResult(16, b'tx-duplicate'))
+        yield rejected(RejectResult(16, b'bad-txns-inputs-duplicate'))
 
         # Test block timestamps
         #  -> b31 (8) -> b33 (9) -> b35 (10) -> b39 (11) -> b42 (12) -> b43 (13) -> b53 (14) -> b55 (15)
