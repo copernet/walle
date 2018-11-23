@@ -26,7 +26,6 @@ def create_block_with_txns(hashprev, txns, nTime=None):
     block.hashPrevBlock = hashprev
     block.nBits = 0x207fffff  # Will break after a difficulty adjustment...
     block.vtx.extend(txns)
-    make_conform_to_ctor(block)
     block.hashMerkleRoot = block.calc_merkle_root()
     block.calc_sha256()
     return block

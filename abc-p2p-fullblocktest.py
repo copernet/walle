@@ -66,7 +66,6 @@ class FullBlockTest(ComparisonTestFramework):
     def add_transactions_to_block(self, block, tx_list):
         [tx.rehash() for tx in tx_list]
         block.vtx.extend(tx_list)
-        block.vtx = [block.vtx[0]] + sorted(block.vtx[1:], key=lambda tx: tx.get_id())
 
     # this is a little handier to use than the version in blocktools.py
     def create_tx(self, spend, value, script=CScript([OP_TRUE])):
@@ -164,6 +163,7 @@ class FullBlockTest(ComparisonTestFramework):
 
             # Now that we added a bunch of transaction, we need to recompute
             # the merkle root.
+            make_conform_to_ctor(block)
             block.hashMerkleRoot = block.calc_merkle_root()
 
         # Check that the block size is what's expected
@@ -212,6 +212,7 @@ class FullBlockTest(ComparisonTestFramework):
             block = self.blocks[block_number]
             self.add_transactions_to_block(block, new_transactions)
             old_sha256 = block.sha256
+            make_conform_to_ctor(block)
             block.hashMerkleRoot = block.calc_merkle_root()
             block.solve()
             # Update the internal state just like in next_block
