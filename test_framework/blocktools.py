@@ -26,10 +26,18 @@ def create_block_with_txns(hashprev, txns, nTime=None):
     block.hashPrevBlock = hashprev
     block.nBits = 0x207fffff  # Will break after a difficulty adjustment...
     block.vtx.extend(txns)
-    block.vtx = [block.vtx[0]] + sorted(block.vtx[1:], key=lambda tx: tx.get_id())
+    make_conform_to_ctor(block)
     block.hashMerkleRoot = block.calc_merkle_root()
     block.calc_sha256()
     return block
+
+
+def make_conform_to_ctor(block):
+    for tx in block.vtx:
+        pad_tx(tx)
+        tx.rehash()
+    block.vtx = [block.vtx[0]] + \
+        sorted(block.vtx[1:], key=lambda tx: tx.get_id())
 
 
 def serialize_script_num(value):
