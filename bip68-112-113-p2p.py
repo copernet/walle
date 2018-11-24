@@ -416,7 +416,8 @@ class BIP68_112_113Test(ComparisonTestFramework):
         bip113signed2 = self.sign_transaction(self.nodes[0], bip113tx_v2)
         for bip113tx in [bip113signed1, bip113signed2]:
             # 11,12
-            yield TestInstance([[self.create_test_block([bip113tx]), False]])
+            yield TestInstance([[self.create_test_block([bip113tx]), True]])
+            self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
 
         # Next block height = 580 after 4 blocks of random version
         test_blocks = self.generate_blocks(4)
@@ -431,54 +432,54 @@ class BIP68_112_113Test(ComparisonTestFramework):
         yield TestInstance([[self.create_test_block(success_txs), True]])  # 14
         self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
 
-        ### Version 2 txs ###
-        # bip68success_txs = []
-        # # All txs with SEQUENCE_LOCKTIME_DISABLE_FLAG set pass
-        # for b25 in range(2):
-        #     for b22 in range(2):
-        #         for b18 in range(2):
-        #             bip68success_txs.append(bip68txs_v2[1][b25][b22][b18])
-        # # 15
-        # yield TestInstance([[self.create_test_block(bip68success_txs), True]])
-        # self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
-        # # All txs without flag fail as we are at delta height = 8 < 10 and delta time = 8 * 600 < 10 * 512
-        # bip68timetxs = []
-        # for b25 in range(2):
-        #     for b18 in range(2):
-        #         bip68timetxs.append(bip68txs_v2[0][b25][1][b18])
-        # for tx in bip68timetxs:
-        #     # 16 - 19
-        #     yield TestInstance([[self.create_test_block([tx]), False]])
-        # bip68heighttxs = []
-        # for b25 in range(2):
-        #     for b18 in range(2):
-        #         bip68heighttxs.append(bip68txs_v2[0][b25][0][b18])
-        # for tx in bip68heighttxs:
-        #     # 20 - 23
-        #     yield TestInstance([[self.create_test_block([tx]), False]])
-        #
-        # # Advance one block to 581
-        # test_blocks = self.generate_blocks(1)
-        # yield TestInstance(test_blocks, sync_every_block=False)  # 24
-        #
-        # # Height txs should fail and time txs should now pass 9 * 600 > 10 * 512
-        # bip68success_txs.extend(bip68timetxs)
-        # # 25
-        # yield TestInstance([[self.create_test_block(bip68success_txs), True]])
-        # self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
-        # for tx in bip68heighttxs:
-        #     # 26 - 29
-        #     yield TestInstance([[self.create_test_block([tx]), False]])
-        #
-        # # Advance one block to 582
-        # test_blocks = self.generate_blocks(1)
-        # yield TestInstance(test_blocks, sync_every_block=False)  # 30
-        #
-        # # All BIP 68 txs should pass
-        # bip68success_txs.extend(bip68heighttxs)
-        # # 31
-        # yield TestInstance([[self.create_test_block(bip68success_txs), True]])
-        # self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+        ## Version 2 txs ###
+        bip68success_txs = []
+        # All txs with SEQUENCE_LOCKTIME_DISABLE_FLAG set pass
+        for b25 in range(2):
+            for b22 in range(2):
+                for b18 in range(2):
+                    bip68success_txs.append(bip68txs_v2[1][b25][b22][b18])
+        # 15
+        yield TestInstance([[self.create_test_block(bip68success_txs), True]])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+        # All txs without flag fail as we are at delta height = 8 < 10 and delta time = 8 * 600 < 10 * 512
+        bip68timetxs = []
+        for b25 in range(2):
+            for b18 in range(2):
+                bip68timetxs.append(bip68txs_v2[0][b25][1][b18])
+        for tx in bip68timetxs:
+            # 16 - 19
+            yield TestInstance([[self.create_test_block([tx]), False]])
+        bip68heighttxs = []
+        for b25 in range(2):
+            for b18 in range(2):
+                bip68heighttxs.append(bip68txs_v2[0][b25][0][b18])
+        for tx in bip68heighttxs:
+            # 20 - 23
+            yield TestInstance([[self.create_test_block([tx]), False]])
+
+        # Advance one block to 581
+        test_blocks = self.generate_blocks(1)
+        yield TestInstance(test_blocks, sync_every_block=False)  # 24
+
+        # Height txs should fail and time txs should now pass 9 * 600 > 10 * 512
+        bip68success_txs.extend(bip68timetxs)
+        # 25
+        yield TestInstance([[self.create_test_block(bip68success_txs), True]])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
+        for tx in bip68heighttxs:
+            # 26 - 29
+            yield TestInstance([[self.create_test_block([tx]), False]])
+
+        # Advance one block to 582
+        test_blocks = self.generate_blocks(1)
+        yield TestInstance(test_blocks, sync_every_block=False)  # 30
+
+        # All BIP 68 txs should pass
+        bip68success_txs.extend(bip68heighttxs)
+        # 31
+        yield TestInstance([[self.create_test_block(bip68success_txs), True]])
+        self.nodes[0].invalidateblock(self.nodes[0].getbestblockhash())
 
         ### BIP 112 ###
         ### Version 1 txs ###
