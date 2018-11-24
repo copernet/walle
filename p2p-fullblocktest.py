@@ -493,7 +493,9 @@ class FullBlockTest(ComparisonTestFramework):
         txout_b37 = PreviousSpendableOutput(b37.vtx[1], 0)
         tx = create_and_sign_tx(out[11].tx, out[11].n, 0)
         b37 = update_block(37, [tx])
-        yield rejected(RejectResult(16, b'bad-txns-inputs-duplicate'))
+        #yield rejected(RejectResult(16, b'bad-txns-inputs-duplicate'))
+        #TODO quick fix, refine later
+        yield rejected(RejectResult(16, b'bad-txns-inputs-missingorspent'))
 
         # attempt to spend b37's first non-coinbase tx, at which point b37 was
         # still considered valid
@@ -729,7 +731,8 @@ class FullBlockTest(ComparisonTestFramework):
         b52 = update_block(52, [b52.vtx[1]])
         # TODO: check sequence
         #yield rejected(RejectResult(16, b'tx-duplicate'))
-        yield rejected(RejectResult(16, b'bad-txns-inputs-duplicate'))
+        #TODO: quick fix, refine later
+        yield rejected(RejectResult(16, b'bad-txns-inputs-missingorspent'))
 
         # Test block timestamps
         #  -> b31 (8) -> b33 (9) -> b35 (10) -> b39 (11) -> b42 (12) -> b43 (13) -> b53 (14) -> b55 (15)
@@ -979,8 +982,7 @@ class FullBlockTest(ComparisonTestFramework):
         tx2 = create_and_sign_tx(tx1, 0, 1)
         tx3 = create_and_sign_tx(tx1, 0, 2)
         update_block(67, [tx1, tx2, tx3])
-        #yield rejected(RejectResult(16, b'bad-txns-inputs-missingorspent'))
-        yield rejected(RejectResult(16, b'bad-txns-inputs-duplicate'))
+        yield rejected(RejectResult(16, b'bad-txns-inputs-missingorspent'))
 
         # More tests of block subsidy
         #
@@ -1321,5 +1323,4 @@ class FullBlockTest(ComparisonTestFramework):
 
 
 if __name__ == '__main__':
-    #FullBlockTest().main()
-    pass
+    FullBlockTest().main()
