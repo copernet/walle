@@ -50,15 +50,12 @@ class MiningTest(BitcoinTestFramework):
         tmpl = node.getblocktemplate()
         self.log.info("getblocktemplate: Test capability advertised")
 
-        assert 'rules' in tmpl
-        assert 'vbavailable' in tmpl
         assert 'transactions' in tmpl
         assert 'coinbaseaux' in tmpl
         assert 'coinbasetxn' not in tmpl
         assert 'mutable' in tmpl
         assert isinstance(tmpl['version'], int)
         assert isinstance(tmpl['curtime'], int)
-        assert isinstance(tmpl['vbrequired'], int)
         assert isinstance(tmpl['coinbasevalue'], int)
         assert_is_hex_string(tmpl['bits'])
         assert_is_hash_string(tmpl['target'])
