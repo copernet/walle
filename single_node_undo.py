@@ -27,6 +27,7 @@ class SingleNodeUndoTest(BitcoinTestFramework):
         self.num_nodes = 1
 
     def setup_network(self):
+        self.extra_args = [['--whitelist=127.0.0.1']] * self.num_nodes
         self.setup_nodes()
 
     def run_test(self):
