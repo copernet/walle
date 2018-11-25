@@ -30,7 +30,7 @@ def assert_template(node, block, expect, rehash=True):
 
 class MiningTest(BitcoinTestFramework):
     def set_test_params(self):
-        self.num_nodes = 1
+        self.num_nodes = 2
         self.setup_clean_chain = False
 
     def run_test(self):
