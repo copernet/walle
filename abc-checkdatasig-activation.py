@@ -101,7 +101,6 @@ class CheckDataSigActivationTest(ComparisonTestFramework):
 
         tx0 = spend_checkdatasig()
         tx0_hex = ToHex(tx0)
-        node.sendrawtransaction
         assert_raises_rpc_error(-26, RPC_BAD_OPCODE_ERROR,
                                 node.sendrawtransaction, tx0_hex)
 
