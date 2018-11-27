@@ -329,11 +329,11 @@ def rpc_url(datadir, i, rpchost=None, scheme='https'):
 ################
 
 
-def initialize_datadir(dirname, n, network, log):
+def initialize_datadir(dirname, n, log):
     log.info("Node: node%d | RPC ports: %d, %d | P2P ports: %d, %d" %
              (n, rpc_port(n), rpc_port(n) + 1, p2p_port(n), p2p_port(n) + 1))
 
-    datadir = os.path.join(dirname, "node" + str(n), network)
+    datadir = os.path.join(dirname, "node" + str(n))
     if not os.path.isdir(datadir):
         os.makedirs(datadir)
     content = f'''

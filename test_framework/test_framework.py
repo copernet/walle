@@ -253,8 +253,7 @@ class BitcoinTestFramework():
         for i in range(num_nodes):
             self.nodes.append(TestNode(i, self.options.tmpdir, extra_args[i], rpchost,
                                         timewait=timewait, binary=binary[i], stderr=None,
-                                        mocktime=self.mocktime, coverage_dir=self.options.coveragedir,
-                                        network=self.options.network
+                                        mocktime=self.mocktime, coverage_dir=self.options.coveragedir
                                        ))
 
     def start_node(self, i, extra_args=None, stderr=None):
@@ -433,10 +432,10 @@ class BitcoinTestFramework():
 
             # Create cache directories, run bitcoinds:
             for i in range(MAX_NODES):
-                initialize_datadir(self.options.cachedir, i, self.options.network, self.log)
+                initialize_datadir(self.options.cachedir, i, self.log)
                 self.nodes.append(TestNode(i, self.options.cachedir, extra_args=[
                 ], rpchost=None, timewait=None, binary=None, stderr=None, mocktime=self.mocktime,
-                                           coverage_dir=None, network=self.options.network))
+                                           coverage_dir=None))
                 self.start_node(i)
                 if i > 0:
                     connect_nodes(self.nodes[i], 0)
@@ -474,7 +473,7 @@ class BitcoinTestFramework():
             to_dir = os.path.join(self.options.tmpdir, "node" + str(i))
             shutil.copytree(from_dir, to_dir)
             # Overwrite port/rpcport in bitcoin.conf
-            initialize_datadir(self.options.tmpdir, i, self.options.network, self.log)
+            initialize_datadir(self.options.tmpdir, i, self.log)
 
     def _initialize_chain_clean(self):
         """Initialize empty blockchain for use by the test.
@@ -482,7 +481,7 @@ class BitcoinTestFramework():
         Create an empty blockchain and num_nodes wallets.
         Useful if a test case wants complete control over initialization."""
         for i in range(self.num_nodes):
-            initialize_datadir(self.options.tmpdir, i, self.options.network, self.log)
+            initialize_datadir(self.options.tmpdir, i, self.log)
 
 
 class ComparisonTestFramework(BitcoinTestFramework):
