@@ -7,3 +7,6 @@ bitcoind
 */*.pyc
 .idea/
 coperctl
+.DS_Store
+junit_results.xml
+test/
