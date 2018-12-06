@@ -292,15 +292,11 @@ class FullBlockTest(ComparisonTestFramework):
         tip(5)
         b12 = block(12, spend=out[3])
         save_spendable_output()
-        #TODO: remove follwing line after added headfirst support
-        yield TestInstance([[b12, False]])
-
         b13 = block(13, spend=out[4])
         # Deliver the block header for b12, and the block b13.
         # b13 should be accepted but the tip won't advance until b12 is
         # delivered.
-        #TODO: headersFirst
-        #yield TestInstance([[CBlockHeader(b12), None], [b13, False]])
+        yield TestInstance([[CBlockHeader(b12), None], [b13, False]])
 
         save_spendable_output()
         # b14 is invalid, but the node won't know that until it tries to connect
@@ -308,9 +304,7 @@ class FullBlockTest(ComparisonTestFramework):
         block(14, spend=out[5], additional_coinbase_value=1)
         yield rejected()
 
-        #TODO: headersFirst
-        #yield TestInstance([[b12, True, b13.sha256]])  # New tip should be b13.
-        yield TestInstance([[b13, True]])
+        yield TestInstance([[b12, True, b13.sha256]])  # New tip should be b13.
 
         # Add a block with MAX_BLOCK_SIGOPS_PER_MB and one with one more sigop
         #     genesis -> b1 (0) -> b2 (1) -> b5 (2) -> b6  (3)
